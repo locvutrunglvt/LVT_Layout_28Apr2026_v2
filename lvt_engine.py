@@ -212,6 +212,13 @@ class LvtEngine:
             for item in layout.items():
                 if isinstance(item, QgsLayoutItemPicture):
                     item.setVisibility(False)
+        else:
+            # Apply selected north arrow style
+            svg_path = params.get("north_arrow_svg", "")
+            if svg_path and os.path.isfile(svg_path):
+                for item in layout.items():
+                    if isinstance(item, QgsLayoutItemPicture):
+                        item.setPicturePath(svg_path)
 
         # ── Final: re-enforce scale (lightweight, no full refresh) ──
         if map_item:

@@ -412,6 +412,45 @@ class LvtDialog(QDialog):
         self.chk_scalebar.setChecked(True)
         for c in [self.chk_legend, self.chk_north, self.chk_scalebar]:
             grp_lay.addWidget(c)
+
+        # ── North Arrow style selector ──
+        from qgis.core import QgsApplication
+        import glob
+        arrow_row = QHBoxLayout()
+        arrow_row.addWidget(QLabel("    🧭 Style:"))
+        self.cmb_arrow = QComboBox()
+        self.cmb_arrow.setMinimumWidth(250)
+
+        # Auto-detect SVG arrows from QGIS install
+        self._arrow_paths = []
+        for svg_dir in QgsApplication.svgPaths():
+            arrow_dir = os.path.join(svg_dir, "arrows")
+            if os.path.isdir(arrow_dir):
+                svgs = sorted(glob.glob(os.path.join(arrow_dir, "NorthArrow_*.svg")))
+                for svg_path in svgs:
+                    name = os.path.splitext(os.path.basename(svg_path))[0]
+                    display = name.replace("NorthArrow_", "North Arrow ")
+                    self.cmb_arrow.addItem(display, svg_path)
+                    self._arrow_paths.append(svg_path)
+                break  # use first found directory
+
+        if not self._arrow_paths:
+            self.cmb_arrow.addItem("(Default / Mặc định)", "")
+
+        # Default to NorthArrow_04 if available
+        for i in range(self.cmb_arrow.count()):
+            if "04" in self.cmb_arrow.itemText(i):
+                self.cmb_arrow.setCurrentIndex(i)
+                break
+
+        arrow_row.addWidget(self.cmb_arrow)
+        arrow_row.addStretch()
+        grp_lay.addLayout(arrow_row)
+
+        # Toggle arrow selector visibility
+        self.cmb_arrow.setEnabled(self.chk_north.isChecked())
+        self.chk_north.toggled.connect(self.cmb_arrow.setEnabled)
+
         g.addWidget(grp, row, 0, 1, 2)
         row += 1
 
@@ -1421,6 +1460,7 @@ thước tỷ lệ, khối tiêu đề, viện dẫn. Xuất bản đồ chuẩn
             "data_sources": self.txt_sources.toPlainText().strip(),
             "show_legend": self.chk_legend.isChecked(),
             "show_north": self.chk_north.isChecked(),
+            "north_arrow_svg": self.cmb_arrow.currentData() or "",
             "show_scalebar": self.chk_scalebar.isChecked(),
         }
 
