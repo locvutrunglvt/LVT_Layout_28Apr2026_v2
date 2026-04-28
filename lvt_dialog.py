@@ -752,53 +752,26 @@ thước tỷ lệ, khối tiêu đề, viện dẫn. Xuất bản đồ chuẩn
             )
             return
 
-        # Disable button to prevent double-click
+        # Disable button + show wait cursor (no modal dialog to avoid freeze)
         self.btn_create.setEnabled(False)
         self.btn_create.setText("⏳ Creating... / Đang tạo...")
-
-        # Determine total steps based on mode
-        total_steps = 10 if params["mode"] == "print" else 9
-
-        # Create progress dialog
-        from qgis.PyQt.QtWidgets import QProgressDialog
-        progress = QProgressDialog(
-            "Initializing... / Đang khởi tạo...", None, 0, total_steps, self
-        )
-        progress.setWindowTitle("🗺️ LVT Map Layout")
-        progress.setMinimumWidth(420)
-        progress.setMinimumDuration(0)  # Show immediately
-        progress.setStyleSheet(
-            "QProgressDialog { background: #fafafa; }"
-            "QProgressBar { border: 2px solid #1565c0; border-radius: 6px; "
-            "  text-align: center; height: 22px; font-weight: bold; }"
-            "QProgressBar::chunk { background: qlineargradient("
-            "  x1:0,y1:0,x2:1,y2:0, stop:0 #1565c0, stop:1 #42a5f5); "
-            "  border-radius: 4px; }"
-        )
-        progress.setValue(0)
-        QCoreApplication.processEvents()
-
-        def on_progress(step, message):
-            progress.setValue(min(step, total_steps))
-            progress.setLabelText(f"🔄 {message}")
-            QCoreApplication.processEvents()
+        from qgis.PyQt.QtWidgets import QApplication
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.processEvents()
 
         try:
-            layout = self.engine.create_layout(params, progress_cb=on_progress)
-            progress.setValue(total_steps)
-            progress.close()
-
+            layout = self.engine.create_layout(params)
             designer = self.iface.openLayoutDesigner(layout)
             try:
                 designer.view().zoomFull()
             except Exception:
                 pass
             self.iface.messageBar().pushSuccess(
-                "LVT", "✅ Layout created! Use File → Export in the designer."
+                "LVT", "✅ Layout created! / Đã tạo khung!"
             )
         except Exception as e:
-            progress.close()
             QMessageBox.critical(self, "Error", str(e))
         finally:
+            QApplication.restoreOverrideCursor()
             self.btn_create.setEnabled(True)
             self.btn_create.setText("Create Layout / Tạo khung")
