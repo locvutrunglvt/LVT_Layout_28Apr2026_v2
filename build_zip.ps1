@@ -2,7 +2,7 @@
 # Usage: Right-click → Run with PowerShell, or run in terminal
 
 $src = $PSScriptRoot
-$outDir = "$env:USERPROFILE\Desktop"
+$outDir = $PSScriptRoot
 $baseName = "LVT_Layout_28Apr2026_v2"
 
 # Find next version number
