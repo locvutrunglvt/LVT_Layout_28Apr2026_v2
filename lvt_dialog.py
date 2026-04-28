@@ -532,17 +532,21 @@ class LvtDialog(QDialog):
         s2, lbl2 = _make_scroll()
         tabs.addTab(s2, "🌐 CRS Guide")
 
+        s3, lbl3 = _make_scroll()
+        tabs.addTab(s3, "👤 Author / Tác giả")
+
         # Load content
         h_en, h_vn = self._help_text_en(), self._help_text_vn()
         c_en, c_vn = self._crs_guide_en(), self._crs_guide_vn()
-        lbl1.setText(h_vn); lbl2.setText(c_vn)
+        a_en, a_vn = self._author_text_en(), self._author_text_vn()
+        lbl1.setText(h_vn); lbl2.setText(c_vn); lbl3.setText(a_vn)
 
         def switch_en():
             btn_en.setChecked(True); btn_vn.setChecked(False)
-            lbl1.setText(h_en); lbl2.setText(c_en)
+            lbl1.setText(h_en); lbl2.setText(c_en); lbl3.setText(a_en)
         def switch_vn():
             btn_vn.setChecked(True); btn_en.setChecked(False)
-            lbl1.setText(h_vn); lbl2.setText(c_vn)
+            lbl1.setText(h_vn); lbl2.setText(c_vn); lbl3.setText(a_vn)
 
         btn_en.clicked.connect(switch_en)
         btn_vn.clicked.connect(switch_vn)
@@ -788,15 +792,7 @@ title block, references. Professional map output (A5→A0).</td></tr>
 <tr><td>B0</td><td>1414 × 1000</td><td>Exhibition, architectural plans</td></tr>
 </table>
 
-<hr>
-<table cellpadding="6" cellspacing="0" style="margin-top:8px">
-<tr><td colspan="2"><b>👨‍💻 Author: Lộc Vũ Trung</b></td></tr>
-<tr><td>📱 Zalo:</td><td>0913 191 178</td></tr>
-<tr><td>🌐 Web:</td><td><a href="http://locvutrung.lvtcenter.it.com">locvutrung.lvtcenter.it.com</a></td></tr>
-<tr><td>▶️ YouTube:</td><td><a href="https://www.youtube.com/@locvutrung">youtube.com/@locvutrung</a></td></tr>
-<tr><td>🎯 Expertise:</td><td><b>FSC/CoC</b> • <b>EUDR</b> • <b>QGIS</b> • <b>DATA</b> • <b>Webapp</b> • <b>Appsheet</b> • <b>Silviculture</b></td></tr>
-</table>
-<p style="color:#888;font-size:10px;margin-top:6px"><i>LVT Map Layout v2.0 — Designed for forestry &amp; environmental mapping.</i></p>"""
+<p style="color:#888;font-size:10px;margin-top:12px"><i>LVT Map Layout v2.0 — Designed for forestry &amp; environmental mapping.</i></p>"""
 
     def _help_text_vn(self):
         return """
@@ -885,16 +881,86 @@ thước tỷ lệ, khối tiêu đề, viện dẫn. Xuất bản đồ chuẩn
 <tr><td>B0</td><td>1414 × 1000</td><td>Triển lãm, bản vẽ kiến trúc</td></tr>
 </table>
 
-<hr>
-<table cellpadding="6" cellspacing="0" style="margin-top:8px">
-<tr><td colspan="2"><b>👨‍💻 Tác giả: Lộc Vũ Trung</b></td></tr>
-<tr><td>📱 Zalo:</td><td>0913 191 178</td></tr>
-<tr><td>🌐 Web:</td><td><a href="http://locvutrung.lvtcenter.it.com">locvutrung.lvtcenter.it.com</a></td></tr>
-<tr><td>▶️ YouTube:</td><td><a href="https://www.youtube.com/@locvutrung">youtube.com/@locvutrung</a></td></tr>
-<tr><td>🎯 Phạm vi:</td><td><b>FSC/CoC</b> • <b>EUDR</b> • <b>QGIS</b> • <b>DATA</b> • <b>Webapp</b> • <b>Appsheet</b> • <b>Silviculture</b></td></tr>
-</table>
-<p style="color:#888;font-size:10px;margin-top:6px"><i>LVT Map Layout v2.0 — Thiết kế cho bản đồ lâm nghiệp &amp; môi trường.</i></p>"""
+<p style="color:#888;font-size:10px;margin-top:12px"><i>LVT Map Layout v2.0 — Thiết kế cho bản đồ lâm nghiệp &amp; môi trường.</i></p>"""
 
+
+    # ── Author Text ───────────────────────────────────────────────
+
+    def _author_text_en(self):
+        return """
+<div style="text-align:center;padding:16px">
+<h2>👨‍💻 Lộc Vũ Trung</h2>
+<p style="font-size:13px;color:#555">GIS & Forestry Technology Specialist</p>
+</div>
+
+<table border="0" cellpadding="8" cellspacing="0" style="width:100%;font-size:12px">
+<tr style="background:#e3f2fd;border-radius:4px">
+<td width="30%">📱 <b>Zalo:</b></td><td>0913 191 178</td></tr>
+<tr style="background:#f5f5f5">
+<td>🌐 <b>Website:</b></td>
+<td><a href="http://locvutrung.lvtcenter.it.com">locvutrung.lvtcenter.it.com</a></td></tr>
+<tr style="background:#e3f2fd">
+<td>▶️ <b>YouTube:</b></td>
+<td><a href="https://www.youtube.com/@locvutrung">youtube.com/@locvutrung</a></td></tr>
+</table>
+
+<h3 style="margin-top:16px">🎯 Expertise</h3>
+<table border="0" cellpadding="6" cellspacing="4" style="font-size:11px">
+<tr>
+<td style="background:#e8f5e9;border-radius:4px;padding:6px 12px">🌲 <b>FSC/CoC</b></td>
+<td style="background:#e3f2fd;border-radius:4px;padding:6px 12px">🇲🇺 <b>EUDR</b></td>
+<td style="background:#fff3e0;border-radius:4px;padding:6px 12px">🗺️ <b>QGIS</b></td>
+<td style="background:#fce4ec;border-radius:4px;padding:6px 12px">📊 <b>DATA</b></td>
+</tr>
+<tr>
+<td style="background:#f3e5f5;border-radius:4px;padding:6px 12px">🌐 <b>Webapp</b></td>
+<td style="background:#e8eaf6;border-radius:4px;padding:6px 12px">📱 <b>Appsheet</b></td>
+<td style="background:#e0f2f1;border-radius:4px;padding:6px 12px" colspan="2">🌳 <b>Silviculture</b></td>
+</tr>
+</table>
+
+<hr>
+<p style="color:#888;font-size:10px;text-align:center;margin-top:12px">
+<i>LVT Map Layout v2.0 — Designed for forestry & environmental mapping.</i>
+</p>"""
+
+    def _author_text_vn(self):
+        return """
+<div style="text-align:center;padding:16px">
+<h2>👨‍💻 Lộc Vũ Trung</h2>
+<p style="font-size:13px;color:#555">Chuyên gia Công nghệ GIS & Lâm nghiệp</p>
+</div>
+
+<table border="0" cellpadding="8" cellspacing="0" style="width:100%;font-size:12px">
+<tr style="background:#e3f2fd;border-radius:4px">
+<td width="30%">📱 <b>Zalo:</b></td><td>0913 191 178</td></tr>
+<tr style="background:#f5f5f5">
+<td>🌐 <b>Website:</b></td>
+<td><a href="http://locvutrung.lvtcenter.it.com">locvutrung.lvtcenter.it.com</a></td></tr>
+<tr style="background:#e3f2fd">
+<td>▶️ <b>YouTube:</b></td>
+<td><a href="https://www.youtube.com/@locvutrung">youtube.com/@locvutrung</a></td></tr>
+</table>
+
+<h3 style="margin-top:16px">🎯 Phạm vi chuyên môn</h3>
+<table border="0" cellpadding="6" cellspacing="4" style="font-size:11px">
+<tr>
+<td style="background:#e8f5e9;border-radius:4px;padding:6px 12px">🌲 <b>FSC/CoC</b></td>
+<td style="background:#e3f2fd;border-radius:4px;padding:6px 12px">🇲🇺 <b>EUDR</b></td>
+<td style="background:#fff3e0;border-radius:4px;padding:6px 12px">🗺️ <b>QGIS</b></td>
+<td style="background:#fce4ec;border-radius:4px;padding:6px 12px">📊 <b>DATA</b></td>
+</tr>
+<tr>
+<td style="background:#f3e5f5;border-radius:4px;padding:6px 12px">🌐 <b>Webapp</b></td>
+<td style="background:#e8eaf6;border-radius:4px;padding:6px 12px">📱 <b>Appsheet</b></td>
+<td style="background:#e0f2f1;border-radius:4px;padding:6px 12px" colspan="2">🌳 <b>Lâm sinh</b></td>
+</tr>
+</table>
+
+<hr>
+<p style="color:#888;font-size:10px;text-align:center;margin-top:12px">
+<i>LVT Map Layout v2.0 — Thiết kế cho bản đồ lâm nghiệp & môi trường.</i>
+</p>"""
 
     # ── CRS Library Text ─────────────────────────────────────────
 
