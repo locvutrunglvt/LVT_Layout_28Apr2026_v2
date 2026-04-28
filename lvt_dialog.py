@@ -793,6 +793,7 @@ title block, references. Professional map output (A5→A0).</td></tr>
 <tr><td colspan="2"><b>👨‍💻 Author: Lộc Vũ Trung</b></td></tr>
 <tr><td>📱 Zalo:</td><td>0913 191 178</td></tr>
 <tr><td>🌐 Web:</td><td><a href="http://locvutrung.lvtcenter.it.com">locvutrung.lvtcenter.it.com</a></td></tr>
+<tr><td>▶️ YouTube:</td><td><a href="https://www.youtube.com/@locvutrung">youtube.com/@locvutrung</a></td></tr>
 <tr><td>🎯 Expertise:</td><td><b>FSC/CoC</b> • <b>EUDR</b> • <b>QGIS</b> • <b>DATA</b> • <b>Webapp</b> • <b>Appsheet</b> • <b>Silviculture</b></td></tr>
 </table>
 <p style="color:#888;font-size:10px;margin-top:6px"><i>LVT Map Layout v2.0 — Designed for forestry &amp; environmental mapping.</i></p>"""
@@ -889,6 +890,7 @@ thước tỷ lệ, khối tiêu đề, viện dẫn. Xuất bản đồ chuẩn
 <tr><td colspan="2"><b>👨‍💻 Tác giả: Lộc Vũ Trung</b></td></tr>
 <tr><td>📱 Zalo:</td><td>0913 191 178</td></tr>
 <tr><td>🌐 Web:</td><td><a href="http://locvutrung.lvtcenter.it.com">locvutrung.lvtcenter.it.com</a></td></tr>
+<tr><td>▶️ YouTube:</td><td><a href="https://www.youtube.com/@locvutrung">youtube.com/@locvutrung</a></td></tr>
 <tr><td>🎯 Phạm vi:</td><td><b>FSC/CoC</b> • <b>EUDR</b> • <b>QGIS</b> • <b>DATA</b> • <b>Webapp</b> • <b>Appsheet</b> • <b>Silviculture</b></td></tr>
 </table>
 <p style="color:#888;font-size:10px;margin-top:6px"><i>LVT Map Layout v2.0 — Thiết kế cho bản đồ lâm nghiệp &amp; môi trường.</i></p>"""
