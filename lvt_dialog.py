@@ -484,10 +484,10 @@ class LvtDialog(QDialog):
     # ── Help ─────────────────────────────────────────────────────
 
     def _show_help(self):
-        """Show help dialog with language toggle."""
+        """Show help dialog with tabs: Plugin Guide + CRS Guide."""
         dlg = QDialog(self)
         dlg.setWindowTitle("📖 LVT Map Layout — Help / Trợ giúp")
-        dlg.setMinimumSize(620, 500)
+        dlg.setMinimumSize(700, 560)
         lay = QVBoxLayout(dlg)
 
         # Language toggle
@@ -508,27 +508,41 @@ class LvtDialog(QDialog):
         btn_row.addStretch()
         lay.addLayout(btn_row)
 
-        # Content
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
-        content = QLabel()
-        content.setWordWrap(True)
-        content.setTextFormat(Qt.RichText)
-        content.setOpenExternalLinks(True)
-        content.setMargin(12)
-        scroll.setWidget(content)
-        lay.addWidget(scroll)
+        # Tabbed content
+        from qgis.PyQt.QtWidgets import QTabWidget
+        tabs = QTabWidget()
+        tabs.setStyleSheet(
+            "QTabWidget::pane{border:1px solid #ccc;border-radius:4px}"
+            "QTabBar::tab{padding:8px 16px;font-weight:bold}"
+            "QTabBar::tab:selected{background:#1565c0;color:#fff;"
+            "border-radius:4px 4px 0 0}"
+        )
+        lay.addWidget(tabs)
 
-        help_en = self._help_text_en()
-        help_vn = self._help_text_vn()
-        content.setText(help_vn)
+        def _make_scroll():
+            s = QScrollArea(); s.setWidgetResizable(True)
+            l = QLabel(); l.setWordWrap(True)
+            l.setTextFormat(Qt.RichText)
+            l.setOpenExternalLinks(True); l.setMargin(12)
+            s.setWidget(l); return s, l
+
+        s1, lbl1 = _make_scroll()
+        tabs.addTab(s1, "🗺️ Plugin Guide")
+
+        s2, lbl2 = _make_scroll()
+        tabs.addTab(s2, "🌐 CRS Guide")
+
+        # Load content
+        h_en, h_vn = self._help_text_en(), self._help_text_vn()
+        c_en, c_vn = self._crs_guide_en(), self._crs_guide_vn()
+        lbl1.setText(h_vn); lbl2.setText(c_vn)
 
         def switch_en():
             btn_en.setChecked(True); btn_vn.setChecked(False)
-            content.setText(help_en)
+            lbl1.setText(h_en); lbl2.setText(c_en)
         def switch_vn():
             btn_vn.setChecked(True); btn_en.setChecked(False)
-            content.setText(help_vn)
+            lbl1.setText(h_vn); lbl2.setText(c_vn)
 
         btn_en.clicked.connect(switch_en)
         btn_vn.clicked.connect(switch_vn)
@@ -905,6 +919,226 @@ thước tỷ lệ, khối tiêu đề, viện dẫn. Xuất bản đồ chuẩn
 <li>📏 <b>Địa chính / cấp tỉnh:</b> Tra múi 3° theo tỉnh ở bảng trên</li>
 </ul>
 <p style="color:#888;font-size:10px"><i>Nguồn: EPSG Registry (epsg.io) — Bộ TN&MT Việt Nam</i></p>"""
+
+    # ── CRS Guide Text ───────────────────────────────────────────
+
+    def _crs_guide_en(self):
+        return """
+<h2>🌐 CRS Control & Conversion Guide</h2>
+<p style="color:#555"><i>Training guide for GPS, QGIS, MapInfo, ArcGIS, Google Earth & Smartphone</i></p>
+
+<h3 style="background:#e3f2fd;padding:6px;border-radius:4px">
+📘 Part 1 — Understanding CRS Basics</h3>
+
+<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;font-size:11px;width:100%">
+<tr style="background:#e3f2fd"><th width="30%">System</th><th>Key Info</th></tr>
+<tr>
+<td>🌍 <b>WGS 84</b><br>EPSG: <b>4326</b></td>
+<td>
+• <b>Unit:</b> Degrees (or D°M'S")<br>
+• <b>Type:</b> Global geographic CRS<br>
+• 📱 <b>Required for:</b> Google Earth, Smartphone apps, GPS devices<br>
+• ⚠️ Cannot measure area/distance accurately (not projected)
+</td>
+</tr>
+<tr>
+<td>🇻🇳 <b>VN-2000</b><br>(Projected, meters)</td>
+<td>
+• <b>Unit:</b> Meters — ideal for area/distance<br>
+• Each province has its own <b>Central Meridian</b> and <b>EPSG code</b><br>
+• Example: Thanh Hóa = 5897, Quảng Nam = 5899, Quảng Trị = 9213
+</td>
+</tr>
+</table>
+
+<h4>⚡ Integration vs Internal System (Critical for GPS users!)</h4>
+<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:11px;width:100%">
+<tr style="background:#fff9c4"><th width="35%">Type</th><th>When to use</th></tr>
+<tr>
+<td>✅ <b>Integration</b><br>(Hệ hội nhập)</td>
+<td>Has full 7 parameters (e.g. -192, -39, -111).<br>
+→ Map <b>aligns perfectly</b> with satellite basemap on screen.</td>
+</tr>
+<tr>
+<td>⚠️ <b>Internal</b><br>(Hệ nội bộ)</td>
+<td>No shift parameters. Use when GPS device is <b>not configured</b> with 7 params.<br>
+→ Printed map coords match GPS readout exactly (even if offset from satellite).</td>
+</tr>
+</table>
+
+<hr>
+<h3 style="background:#e8f5e9;padding:6px;border-radius:4px">
+🔧 Part 2 — Fixing Misaligned Maps</h3>
+<p>When your map is offset from the basemap or "floating in the ocean":</p>
+
+<table border="0" cellpadding="4" style="font-size:11px;width:100%">
+<tr><td style="background:#e3f2fd;border-radius:4px;padding:8px">
+<b>🔍 Step 1 — Identify the original CRS</b><br>
+• Open Basemap (Google Satellite) to compare rivers, roads<br>
+• Check coordinates: if values like <code>107.75</code> → <code>0.75 × 60 = 45'</code> → Central meridian = <b>107°45'</b><br>
+• Look up the province in the CRS table
+</td></tr>
+<tr><td style="background:#fff9c4;border-radius:4px;padding:8px">
+<b>⚙️ Step 2 — Define / Set CRS (NOT Export!)</b><br>
+• ❌ Do <b>NOT</b> use Export/Save As yet!<br>
+• ✅ Use <b>"Set Layer CRS"</b> to assign the correct EPSG (e.g. 5899)<br>
+• Map will <b>snap to correct position</b> immediately
+</td></tr>
+<tr><td style="background:#e8f5e9;border-radius:4px;padding:8px">
+<b>📤 Step 3 — Reproject (Export)</b><br>
+• Only after the map is in the right place<br>
+• Export → Save As → choose target CRS (e.g. WGS84 / 4326)
+</td></tr>
+</table>
+
+<hr>
+<h3 style="background:#fce4ec;padding:6px;border-radius:4px">
+📱 Part 3 — Export to Smartphone & Google Earth</h3>
+
+<table border="0" cellpadding="4" style="font-size:11px;width:100%">
+<tr><td style="background:#f3e5f5;border-radius:4px;padding:8px">
+<b>1️⃣ Fix fonts:</b> Convert TCVN3 → Unicode in Attribute Table
+</td></tr>
+<tr><td style="background:#e8eaf6;border-radius:4px;padding:8px">
+<b>2️⃣ Install Plugin:</b> "KML Tools" in QGIS
+</td></tr>
+<tr><td style="background:#e3f2fd;border-radius:4px;padding:8px">
+<b>3️⃣ Export KMZ:</b> Select only essential fields (Owner, Location, Land type, Plot)<br>
+❌ Don't export all columns → file too heavy
+</td></tr>
+<tr><td style="background:#e8f5e9;border-radius:4px;padding:8px">
+<b>4️⃣ Share:</b> Send .kmz via Zalo → Open on phone with Google Earth
+</td></tr>
+</table>
+
+<hr>
+<h3 style="background:#fff3e0;padding:6px;border-radius:4px">
+🔢 Part 4 — DMS ↔ Decimal Conversion</h3>
+
+<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:11px;width:100%">
+<tr style="background:#fff9c4"><th>Direction</th><th>QGIS Formula</th><th>Example</th></tr>
+<tr>
+<td>D°M'S" → <b>Decimal</b></td>
+<td><code>dms_to_degree("column")</code><br>Output field: Decimal/Real</td>
+<td>105°27'35" → <b>105.45972</b></td>
+</tr>
+<tr>
+<td>Decimal → <b>D°M'S"</b></td>
+<td><code>to_dms(X)</code> or<br><code>to_dms(transform($geometry, 'EPSG:3405', 'EPSG:4326'))</code><br>Output field: Text</td>
+<td>105.45972 → <b>105°27'35"</b></td>
+</tr>
+</table>
+<p>💡 Use <b>Field Calculator</b> in Attribute Table to batch-convert entire columns.</p>
+"""
+
+    def _crs_guide_vn(self):
+        return """
+<h2>🌐 Hướng dẫn Kiểm soát & Chuyển đổi Hệ tọa độ</h2>
+<p style="color:#555"><i>Tài liệu đào tạo cho GPS, QGIS, MapInfo, ArcGIS, Google Earth & Smartphone</i></p>
+
+<h3 style="background:#e3f2fd;padding:6px;border-radius:4px">
+📘 Phần 1 — Hiểu đúng về CRS cơ bản</h3>
+
+<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;font-size:11px;width:100%">
+<tr style="background:#e3f2fd"><th width="30%">Hệ tọa độ</th><th>Thông tin chính</th></tr>
+<tr>
+<td>🌍 <b>WGS 84</b><br>EPSG: <b>4326</b></td>
+<td>
+• <b>Đơn vị:</b> Độ (hoặc Độ Phút Giây)<br>
+• <b>Loại:</b> Hệ tọa độ địa lý toàn cầu<br>
+• 📱 <b>Bắt buộc cho:</b> Google Earth, App điện thoại, máy GPS<br>
+• ⚠️ Không đo diện tích/khoảng cách chính xác (chưa chiếu phẳng)
+</td>
+</tr>
+<tr>
+<td>🇻🇳 <b>VN-2000</b><br>(Hệ phẳng, mét)</td>
+<td>
+• <b>Đơn vị:</b> Mét — lý tưởng để đo diện tích/khoảng cách<br>
+• Mỗi tỉnh có <b>Kinh tuyến trục</b> và <b>mã EPSG</b> riêng<br>
+• Ví dụ: Thanh Hóa = 5897, Quảng Nam = 5899, Quảng Trị = 9213
+</td>
+</tr>
+</table>
+
+<h4>⚡ Hệ Hội nhập vs Hệ Nội bộ (Rất quan trọng khi đo GPS!)</h4>
+<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:11px;width:100%">
+<tr style="background:#fff9c4"><th width="35%">Loại</th><th>Khi nào dùng</th></tr>
+<tr>
+<td>✅ <b>Hệ hội nhập</b></td>
+<td>Có đủ 7 tham số (ví dụ: -192, -39, -111).<br>
+→ Bản đồ <b>khớp hoàn hảo</b> với ảnh vệ tinh (Basemap) trên máy tính.</td>
+</tr>
+<tr>
+<td>⚠️ <b>Hệ nội bộ</b></td>
+<td>Không có tham số dịch chuyển. Dùng khi GPS cầm tay <b>chưa cài 7 tham số</b>.<br>
+→ Tọa độ in ra <b>khớp với số đọc trên GPS</b> (dù lệch ảnh vệ tinh).</td>
+</tr>
+</table>
+
+<hr>
+<h3 style="background:#e8f5e9;padding:6px;border-radius:4px">
+🔧 Phần 2 — Xử lý Bản đồ bị lệch</h3>
+<p>Khi mở file thấy bản đồ lệch ảnh vệ tinh hoặc nằm giữa biển:</p>
+
+<table border="0" cellpadding="4" style="font-size:11px;width:100%">
+<tr><td style="background:#e3f2fd;border-radius:4px;padding:8px">
+<b>🔍 Bước 1 — Xác định hệ tọa độ gốc</b><br>
+• Mở Basemap (Google Satellite) để đối chiếu sông, đường<br>
+• Kiểm tra tọa độ: nếu thấy <code>107.75</code> → <code>0.75 × 60 = 45'</code> → Kinh tuyến trục = <b>107°45'</b><br>
+• Tra bảng CRS để biết thuộc tỉnh nào
+</td></tr>
+<tr><td style="background:#fff9c4;border-radius:4px;padding:8px">
+<b>⚙️ Bước 2 — Định nghĩa lại CRS (KHÔNG Export!)</b><br>
+• ❌ <b>TUYỆT ĐỐI</b> không dùng Export/Save As vội!<br>
+• ✅ Dùng <b>"Set Layer CRS"</b> để ép đúng mã EPSG (ví dụ: 5899)<br>
+• Bản đồ sẽ <b>nhảy về đúng vị trí</b> ngay lập tức
+</td></tr>
+<tr><td style="background:#e8f5e9;border-radius:4px;padding:8px">
+<b>📤 Bước 3 — Chuyển đổi (Export)</b><br>
+• Chỉ khi bản đồ đã nằm đúng vị trí<br>
+• Export → Save As → chọn hệ tọa độ đích (ví dụ: WGS84 / 4326)
+</td></tr>
+</table>
+
+<hr>
+<h3 style="background:#fce4ec;padding:6px;border-radius:4px">
+📱 Phần 3 — Xuất bản đồ lên Điện thoại & Google Earth</h3>
+
+<table border="0" cellpadding="4" style="font-size:11px;width:100%">
+<tr><td style="background:#f3e5f5;border-radius:4px;padding:8px">
+<b>1️⃣ Sửa font:</b> Chuyển TCVN3 → Unicode trong Bảng thuộc tính
+</td></tr>
+<tr><td style="background:#e8eaf6;border-radius:4px;padding:8px">
+<b>2️⃣ Cài Plugin:</b> "KML Tools" trong QGIS
+</td></tr>
+<tr><td style="background:#e3f2fd;border-radius:4px;padding:8px">
+<b>3️⃣ Xuất KMZ:</b> Chỉ chọn các trường cần thiết (Chủ rừng, Địa danh, Loại đất, Lô, Khoảnh)<br>
+❌ Không chọn hết tất cả → file quá nặng
+</td></tr>
+<tr><td style="background:#e8f5e9;border-radius:4px;padding:8px">
+<b>4️⃣ Chia sẻ:</b> Gửi .kmz qua Zalo → Mở trên điện thoại bằng Google Earth
+</td></tr>
+</table>
+
+<hr>
+<h3 style="background:#fff3e0;padding:6px;border-radius:4px">
+🔢 Phần 4 — Chuyển đổi Độ Phút Giây ↔ Số thập phân</h3>
+
+<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:11px;width:100%">
+<tr style="background:#fff9c4"><th>Chiều</th><th>Công thức QGIS</th><th>Ví dụ</th></tr>
+<tr>
+<td>Độ°Phút'Giây" → <b>Thập phân</b></td>
+<td><code>dms_to_degree("tên_cột")</code><br>Kiểu cột: Decimal/Real</td>
+<td>105°27'35" → <b>105.45972</b></td>
+</tr>
+<tr>
+<td>Thập phân → <b>Độ°Phút'Giây"</b></td>
+<td><code>to_dms(X)</code> hoặc<br><code>to_dms(transform($geometry, 'EPSG:3405', 'EPSG:4326'))</code><br>Kiểu cột: Text</td>
+<td>105.45972 → <b>105°27'35"</b></td>
+</tr>
+</table>
+<p>💡 Dùng <b>Field Calculator</b> trong Bảng thuộc tính để chuyển đổi hàng loạt.</p>
+"""
 
     # ── Collect Parameters ───────────────────────────────────────
 
