@@ -186,21 +186,13 @@ class LvtDialog(QDialog):
         g.addWidget(self.txt_study, row, 1)
         row += 1
 
-        self.lbl_refs = QLabel("References / Viện dẫn:")
-        g.addWidget(self.lbl_refs, row, 0)
-        self.txt_refs = QLabel(
-            "<i style='color:#555'>Viện dẫn dữ liệu — Điền ở tab Content</i>"
-        )
-        self.txt_refs.setTextFormat(Qt.RichText)
-        g.addWidget(self.txt_refs, row, 1)
-        row += 1
+        # References / Viện dẫn: fixed in template, not editable
 
         # Store print-only widgets for toggle
         self._print_widgets = [
             self.lbl_title, self.txt_title,
             self.lbl_org, self.txt_org,
             self.lbl_study, self.txt_study,
-            self.lbl_refs, self.txt_refs,
         ]
         for wgt in self._print_widgets:
             wgt.setVisible(False)  # hidden by default (Slide mode)
@@ -1598,7 +1590,7 @@ thước tỷ lệ, khối tiêu đề, viện dẫn. Xuất bản đồ chuẩn
             "title": self.txt_title.text().strip(),
             "org_name": self.txt_org.text().strip(),
             "study_area": self.txt_study.text().strip(),
-            "references": "",
+            "references": "",  # fixed in template
             "author": self.txt_author.text().strip(),
             "date": self.txt_date.text().strip(),
             "page_width": pw,
