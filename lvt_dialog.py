@@ -21,12 +21,20 @@ from .lvt_engine import LvtEngine
 
 # Paper sizes in mm (width x height for landscape)
 PAPER_SIZES = {
-    "A5 (210 x 148)": (210, 148),
-    "A4 (297 x 210)": (297, 210),
-    "A3 (420 x 297)": (420, 297),
-    "A2 (594 x 420)": (594, 420),
-    "A1 (841 x 594)": (841, 594),
-    "A0 (1189 x 841)": (1189, 841),
+    # A-series (ISO 216)
+    "A5 (210 × 148 mm)": (210, 148),
+    "A4 (297 × 210 mm)": (297, 210),
+    "A3 (420 × 297 mm)": (420, 297),
+    "A2 (594 × 420 mm)": (594, 420),
+    "A1 (841 × 594 mm)": (841, 594),
+    "A0 (1189 × 841 mm)": (1189, 841),
+    # B-series (ISO 216)
+    "B5 (250 × 176 mm)": (250, 176),
+    "B4 (353 × 250 mm)": (353, 250),
+    "B3 (500 × 353 mm)": (500, 353),
+    "B2 (707 × 500 mm)": (707, 500),
+    "B1 (1000 × 707 mm)": (1000, 707),
+    "B0 (1414 × 1000 mm)": (1414, 1000),
 }
 
 # Layout modes
@@ -588,15 +596,23 @@ title block, references. Professional map output (A5→A0).</td></tr>
 <li>💾 <b>File → Export as PDF</b> or <b>Export as Image</b> (PNG/TIFF).</li>
 </ol>
 
-<h3>📄 Paper Size Reference</h3>
+<h3>📄 Paper Size Reference (ISO 216)</h3>
 <table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:11px">
 <tr style="background:#f5f5f5"><th>Size</th><th>Dimensions (mm)</th><th>Best for</th></tr>
+<tr style="background:#e3f2fd"><td colspan="3"><b>A-series</b></td></tr>
 <tr><td>A5</td><td>210 × 148</td><td>Field pocket maps</td></tr>
 <tr><td>A4</td><td>297 × 210</td><td>Reports, desk reference</td></tr>
 <tr><td>A3</td><td>420 × 297</td><td>Field operations, presentations</td></tr>
 <tr><td>A2</td><td>594 × 420</td><td>Wall display, planning</td></tr>
 <tr><td>A1</td><td>841 × 594</td><td>Large wall maps</td></tr>
 <tr><td>A0</td><td>1189 × 841</td><td>Exhibition, official submissions</td></tr>
+<tr style="background:#e8f5e9"><td colspan="3"><b>B-series</b> (larger than A at same number)</td></tr>
+<tr><td>B5</td><td>250 × 176</td><td>Books, envelopes</td></tr>
+<tr><td>B4</td><td>353 × 250</td><td>Newspapers, atlases</td></tr>
+<tr><td>B3</td><td>500 × 353</td><td>Posters, large charts</td></tr>
+<tr><td>B2</td><td>707 × 500</td><td>Large posters, wall maps</td></tr>
+<tr><td>B1</td><td>1000 × 707</td><td>Very large wall displays</td></tr>
+<tr><td>B0</td><td>1414 × 1000</td><td>Exhibition, architectural plans</td></tr>
 </table>
 
 <hr>
@@ -676,15 +692,23 @@ thước tỷ lệ, khối tiêu đề, viện dẫn. Xuất bản đồ chuẩn
 <li>💾 <b>File → Export as PDF</b> hoặc <b>Export as Image</b> (PNG/TIFF).</li>
 </ol>
 
-<h3>📄 Bảng khổ giấy tham khảo</h3>
+<h3>📄 Bảng khổ giấy tham khảo (ISO 216)</h3>
 <table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:11px">
 <tr style="background:#f5f5f5"><th>Khổ</th><th>Kích thước (mm)</th><th>Phù hợp cho</th></tr>
+<tr style="background:#e3f2fd"><td colspan="3"><b>Dòng A</b></td></tr>
 <tr><td>A5</td><td>210 × 148</td><td>Bản đồ bỏ túi, thực địa</td></tr>
 <tr><td>A4</td><td>297 × 210</td><td>Báo cáo, tài liệu tham khảo</td></tr>
 <tr><td>A3</td><td>420 × 297</td><td>Thực địa, trình bày</td></tr>
 <tr><td>A2</td><td>594 × 420</td><td>Treo tường, quy hoạch</td></tr>
 <tr><td>A1</td><td>841 × 594</td><td>Bản đồ treo tường lớn</td></tr>
 <tr><td>A0</td><td>1189 × 841</td><td>Triển lãm, nộp hồ sơ chính thức</td></tr>
+<tr style="background:#e8f5e9"><td colspan="3"><b>Dòng B</b> (lớn hơn A cùng số)</td></tr>
+<tr><td>B5</td><td>250 × 176</td><td>Sách, bìa thư</td></tr>
+<tr><td>B4</td><td>353 × 250</td><td>Báo, tập bản đồ</td></tr>
+<tr><td>B3</td><td>500 × 353</td><td>Poster, biểu đồ lớn</td></tr>
+<tr><td>B2</td><td>707 × 500</td><td>Poster lớn, bản đồ treo tường</td></tr>
+<tr><td>B1</td><td>1000 × 707</td><td>Trưng bày cỡ rất lớn</td></tr>
+<tr><td>B0</td><td>1414 × 1000</td><td>Triển lãm, bản vẽ kiến trúc</td></tr>
 </table>
 
 <hr>
