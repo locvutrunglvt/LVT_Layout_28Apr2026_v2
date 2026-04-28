@@ -224,8 +224,8 @@ class LvtDialog(QDialog):
             f"📍 <b>{cur_crs.authid()}</b> — {cur_crs.description()}"
         )
         self._crs_label.setStyleSheet(
-            "background:#e8f5e9;padding:4px 8px;border-radius:3px;"
-            "font-size:11px;border:1px solid #a5d6a7"
+            "padding:4px 8px;border-radius:3px;"
+            "font-size:11px;font-weight:bold;border:1px solid #999"
         )
         self._crs_label.setWordWrap(True)
         self._crs_label.setTextFormat(Qt.RichText)
@@ -700,8 +700,8 @@ class LvtDialog(QDialog):
             f"<b>{current_crs.authid()}</b> — {current_crs.description()}"
         )
         crs_info.setStyleSheet(
-            "background:#e8f5e9;padding:8px;border-radius:4px;"
-            "font-size:12px;border:1px solid #a5d6a7"
+            "padding:8px;border-radius:4px;"
+            "font-size:12px;font-weight:bold;border:1px solid #999"
         )
         crs_info.setWordWrap(True)
         lay.addWidget(crs_info)
@@ -777,16 +777,33 @@ class LvtDialog(QDialog):
         btn_row.addStretch()
         lay.addLayout(btn_row)
 
-        # ── CRS content ──
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
+        # ── Tabbed CRS content ──
+        tabs = QTabWidget()
+
+        # --- Tab 1: CRS Library (34 provinces) ---
+        scroll1 = QScrollArea()
+        scroll1.setWidgetResizable(True)
         content = QLabel()
         content.setWordWrap(True)
         content.setTextFormat(Qt.RichText)
         content.setOpenExternalLinks(True)
         content.setMargin(12)
-        scroll.setWidget(content)
-        lay.addWidget(scroll)
+        scroll1.setWidget(content)
+        tabs.addTab(scroll1, "🌐 CRS 34 Tỉnh Mới")
+
+        # --- Tab 2: Legacy 63 provinces ---
+        scroll2 = QScrollArea()
+        scroll2.setWidgetResizable(True)
+        legacy = QLabel()
+        legacy.setWordWrap(True)
+        legacy.setTextFormat(Qt.RichText)
+        legacy.setOpenExternalLinks(True)
+        legacy.setMargin(12)
+        legacy.setText(self._crs_legacy_63())
+        scroll2.setWidget(legacy)
+        tabs.addTab(scroll2, "📋 63 Tỉnh Cũ (Tham khảo)")
+
+        lay.addWidget(tabs)
 
         crs_en = self._crs_text_en()
         crs_vn = self._crs_text_vn()
@@ -1205,6 +1222,82 @@ thước tỷ lệ, khối tiêu đề, viện dẫn. Xuất bản đồ chuẩn
 <li>📏 <b>Địa chính / cấp tỉnh:</b> Tra múi 3° theo tỉnh ở bảng trên</li>
 </ul>
 <p style="color:#888;font-size:10px"><i>Nguồn: EPSG Registry (epsg.io) — Bộ TN&MT Việt Nam</i></p>"""
+
+    def _crs_legacy_63(self):
+        """HTML table of legacy 63 provinces with EPSG Authority IDs."""
+        return """
+<h2>📋 Danh sách 63 Tỉnh Thành Cũ — Kinh tuyến trục & Authority ID</h2>
+<p style="color:#555"><i>Dữ liệu tham khảo (trước sáp nhập). Nguồn: Bộ TN&MT.</i></p>
+
+<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:11px;width:100%">
+<tr style="background:#f5f5f5"><th>STT</th><th>Mã</th><th>Tỉnh/TP</th><th>KTT</th><th>Authority ID</th></tr>
+<tr><td>1</td><td>DC01</td><td>An Giang</td><td>104°45'</td><td>EPSG:9208</td></tr>
+<tr><td>2</td><td>DC02</td><td>Bà Rịa-Vũng Tàu</td><td>107°45'</td><td>EPSG:5899</td></tr>
+<tr><td>3</td><td>DC03</td><td>Bạc Liêu</td><td>105°00'</td><td>EPSG:5896</td></tr>
+<tr><td>4</td><td>DC04</td><td>Bắc Giang</td><td>107°00'</td><td>EPSG:9214</td></tr>
+<tr><td>5</td><td>DC05</td><td>Bắc Kạn</td><td>106°30'</td><td>EPSG:9213</td></tr>
+<tr><td>6</td><td>DC06</td><td>Bắc Ninh</td><td>105°30'</td><td>EPSG:9209</td></tr>
+<tr><td>7</td><td>DC07</td><td>Bến Tre</td><td>105°45'</td><td>EPSG:9210</td></tr>
+<tr><td>8</td><td>DC08</td><td>Bình Dương</td><td>105°45'</td><td>EPSG:9210</td></tr>
+<tr><td>9</td><td>DC09</td><td>Bình Định</td><td>108°15'</td><td>EPSG:9217</td></tr>
+<tr><td>10</td><td>DC10</td><td>Bình Phước</td><td>106°15'</td><td>EPSG:9212</td></tr>
+<tr><td>11</td><td>DC11</td><td>Bình Thuận</td><td>108°30'</td><td>EPSG:9218</td></tr>
+<tr><td>12</td><td>DC12</td><td>Cà Mau</td><td>104°30'</td><td>EPSG:9207</td></tr>
+<tr><td>13</td><td>DC13</td><td>Cao Bằng</td><td>105°45'</td><td>EPSG:9210</td></tr>
+<tr><td>14</td><td>DC14</td><td>Cần Thơ</td><td>105°00'</td><td>EPSG:5896</td></tr>
+<tr><td>15</td><td>DC15</td><td>Đà Nẵng</td><td>107°45'</td><td>EPSG:5899</td></tr>
+<tr><td>16</td><td>DC16</td><td>Đắk Lắk</td><td>108°30'</td><td>EPSG:9218</td></tr>
+<tr><td>17</td><td>DC17</td><td>Đắk Nông</td><td>108°30'</td><td>EPSG:9218</td></tr>
+<tr><td>18</td><td>DC18</td><td>Điện Biên</td><td>103°00'</td><td>EPSG:9205</td></tr>
+<tr><td>19</td><td>DC19</td><td>Đồng Nai</td><td>107°45'</td><td>EPSG:5899</td></tr>
+<tr><td>20</td><td>DC20</td><td>Đồng Tháp</td><td>105°00'</td><td>EPSG:5896</td></tr>
+<tr><td>21</td><td>DC21</td><td>Gia Lai</td><td>108°30'</td><td>EPSG:9218</td></tr>
+<tr><td>22</td><td>DC22</td><td>Hà Giang</td><td>105°30'</td><td>EPSG:9209</td></tr>
+<tr><td>23</td><td>DC23</td><td>Hà Nam</td><td>105°00'</td><td>EPSG:5896</td></tr>
+<tr><td>24</td><td>DC24</td><td>Hà Nội</td><td>105°00'</td><td>EPSG:5896</td></tr>
+<tr><td>25</td><td>DC25</td><td>Hà Tĩnh</td><td>105°30'</td><td>EPSG:9209</td></tr>
+<tr><td>26</td><td>DC26</td><td>Hải Dương</td><td>105°30'</td><td>EPSG:9209</td></tr>
+<tr><td>27</td><td>DC27</td><td>Hải Phòng</td><td>105°45'</td><td>EPSG:9210</td></tr>
+<tr><td>28</td><td>DC28</td><td>Hậu Giang</td><td>105°00'</td><td>EPSG:5896</td></tr>
+<tr><td>29</td><td>DC29</td><td>Hòa Bình</td><td>106°00'</td><td>EPSG:9211</td></tr>
+<tr><td>30</td><td>DC30</td><td>TP HCM</td><td>105°45'</td><td>EPSG:9210</td></tr>
+<tr><td>31</td><td>DC31</td><td>Hưng Yên</td><td>105°30'</td><td>EPSG:9209</td></tr>
+<tr><td>32</td><td>DC32</td><td>Khánh Hòa</td><td>108°15'</td><td>EPSG:9217</td></tr>
+<tr><td>33</td><td>DC33</td><td>Kiên Giang</td><td>104°30'</td><td>EPSG:9207</td></tr>
+<tr><td>34</td><td>DC34</td><td>Kon Tum</td><td>107°30'</td><td>EPSG:9216</td></tr>
+<tr><td>35</td><td>DC35</td><td>Lai Châu</td><td>103°00'</td><td>EPSG:9205</td></tr>
+<tr><td>36</td><td>DC36</td><td>Lạng Sơn</td><td>107°15'</td><td>EPSG:9215</td></tr>
+<tr><td>37</td><td>DC37</td><td>Lào Cai</td><td>104°45'</td><td>EPSG:9208</td></tr>
+<tr><td>38</td><td>DC38</td><td>Lâm Đồng</td><td>107°45'</td><td>EPSG:5899</td></tr>
+<tr><td>39</td><td>DC39</td><td>Long An</td><td>105°45'</td><td>EPSG:9210</td></tr>
+<tr><td>40</td><td>DC40</td><td>Nam Định</td><td>105°30'</td><td>EPSG:9209</td></tr>
+<tr><td>41</td><td>DC41</td><td>Nghệ An</td><td>104°45'</td><td>EPSG:9208</td></tr>
+<tr><td>42</td><td>DC42</td><td>Ninh Bình</td><td>105°00'</td><td>EPSG:5896</td></tr>
+<tr><td>43</td><td>DC43</td><td>Ninh Thuận</td><td>108°15'</td><td>EPSG:9217</td></tr>
+<tr><td>44</td><td>DC44</td><td>Phú Thọ</td><td>104°45'</td><td>EPSG:9208</td></tr>
+<tr><td>45</td><td>DC45</td><td>Phú Yên</td><td>108°30'</td><td>EPSG:9218</td></tr>
+<tr><td>46</td><td>DC46</td><td>Quảng Bình</td><td>106°00'</td><td>EPSG:9211</td></tr>
+<tr><td>47</td><td>DC47</td><td>Quảng Nam</td><td>107°45'</td><td>EPSG:5899</td></tr>
+<tr><td>48</td><td>DC48</td><td>Quảng Ngãi</td><td>108°00'</td><td>EPSG:9216</td></tr>
+<tr><td>49</td><td>DC49</td><td>Quảng Ninh</td><td>107°45'</td><td>EPSG:5899</td></tr>
+<tr><td>50</td><td>DC50</td><td>Quảng Trị</td><td>106°15'</td><td>EPSG:9212</td></tr>
+<tr><td>51</td><td>DC51</td><td>Sóc Trăng</td><td>105°30'</td><td>EPSG:9209</td></tr>
+<tr><td>52</td><td>DC52</td><td>Sơn La</td><td>104°00'</td><td>EPSG:9206</td></tr>
+<tr><td>53</td><td>DC53</td><td>Tây Ninh</td><td>105°30'</td><td>EPSG:9209</td></tr>
+<tr><td>54</td><td>DC54</td><td>Thái Bình</td><td>105°30'</td><td>EPSG:9209</td></tr>
+<tr><td>55</td><td>DC55</td><td>Thái Nguyên</td><td>106°30'</td><td>EPSG:9213</td></tr>
+<tr><td>56</td><td>DC56</td><td>Thanh Hóa</td><td>105°00'</td><td>EPSG:5896</td></tr>
+<tr><td>57</td><td>DC57</td><td>Thừa Thiên Huế</td><td>107°00'</td><td>EPSG:9214</td></tr>
+<tr><td>58</td><td>DC58</td><td>Tiền Giang</td><td>105°45'</td><td>EPSG:9210</td></tr>
+<tr><td>59</td><td>DC59</td><td>Trà Vinh</td><td>105°30'</td><td>EPSG:9209</td></tr>
+<tr><td>60</td><td>DC60</td><td>Tuyên Quang</td><td>106°00'</td><td>EPSG:9211</td></tr>
+<tr><td>61</td><td>DC61</td><td>Vĩnh Long</td><td>105°30'</td><td>EPSG:9209</td></tr>
+<tr><td>62</td><td>DC62</td><td>Vĩnh Phúc</td><td>105°00'</td><td>EPSG:5896</td></tr>
+<tr><td>63</td><td>DC63</td><td>Yên Bái</td><td>104°45'</td><td>EPSG:9208</td></tr>
+</table>
+
+<p style="color:#888;font-size:10px"><i>⚠️ Dữ liệu tham khảo — Trước sáp nhập hành chính 2026. Nguồn: Bộ TN&MT.</i></p>
+"""
 
     # ── CRS Guide Text ───────────────────────────────────────────
 
