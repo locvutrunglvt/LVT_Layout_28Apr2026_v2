@@ -93,6 +93,16 @@ class LvtDialog(QDialog):
         btn_close.clicked.connect(self.close)
 
         btn_row.addWidget(btn_help)
+
+        btn_crs = QPushButton("🌐 CRS")
+        btn_crs.setStyleSheet(
+            "QPushButton{background:#1565c0;color:#fff;font-weight:bold;"
+            "padding:6px 14px;border-radius:4px}"
+            "QPushButton:hover{background:#1976d2}"
+        )
+        btn_crs.clicked.connect(self._show_crs)
+        btn_row.addWidget(btn_crs)
+
         btn_row.addStretch()
         btn_row.addWidget(btn_close)
         btn_row.addWidget(self.btn_create)
@@ -474,10 +484,10 @@ class LvtDialog(QDialog):
     # ── Help ─────────────────────────────────────────────────────
 
     def _show_help(self):
-        """Show help dialog with language toggle and CRS library tab."""
+        """Show help dialog with language toggle."""
         dlg = QDialog(self)
-        dlg.setWindowTitle("LVT Map Layout — Help / Trợ giúp")
-        dlg.setMinimumSize(680, 560)
+        dlg.setWindowTitle("📖 LVT Map Layout — Help / Trợ giúp")
+        dlg.setMinimumSize(620, 500)
         lay = QVBoxLayout(dlg)
 
         # Language toggle
@@ -498,52 +508,98 @@ class LvtDialog(QDialog):
         btn_row.addStretch()
         lay.addLayout(btn_row)
 
-        # Tabbed content
-        from qgis.PyQt.QtWidgets import QTabWidget
-        tabs = QTabWidget()
-        tabs.setStyleSheet(
-            "QTabWidget::pane{border:1px solid #ccc;border-radius:4px}"
-            "QTabBar::tab{padding:8px 18px;font-weight:bold}"
-            "QTabBar::tab:selected{background:#1565c0;color:#fff;border-radius:4px 4px 0 0}"
-        )
-        lay.addWidget(tabs)
+        # Content
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        content = QLabel()
+        content.setWordWrap(True)
+        content.setTextFormat(Qt.RichText)
+        content.setOpenExternalLinks(True)
+        content.setMargin(12)
+        scroll.setWidget(content)
+        lay.addWidget(scroll)
 
-        # ── Tab 1: Help ──
-        def _make_scroll_label():
-            scroll = QScrollArea()
-            scroll.setWidgetResizable(True)
-            lbl = QLabel()
-            lbl.setWordWrap(True)
-            lbl.setTextFormat(Qt.RichText)
-            lbl.setOpenExternalLinks(True)
-            lbl.setMargin(12)
-            scroll.setWidget(lbl)
-            return scroll, lbl
-
-        scroll_help, lbl_help = _make_scroll_label()
-        tabs.addTab(scroll_help, "📖 Help / Trợ giúp")
-
-        # ── Tab 2: CRS Library ──
-        scroll_crs, lbl_crs = _make_scroll_label()
-        tabs.addTab(scroll_crs, "🌐 CRS Library / Hệ tọa độ")
-
-        # Load content
         help_en = self._help_text_en()
         help_vn = self._help_text_vn()
-        crs_en = self._crs_text_en()
-        crs_vn = self._crs_text_vn()
-
-        lbl_help.setText(help_vn)
-        lbl_crs.setText(crs_vn)
+        content.setText(help_vn)
 
         def switch_en():
             btn_en.setChecked(True); btn_vn.setChecked(False)
-            lbl_help.setText(help_en)
-            lbl_crs.setText(crs_en)
+            content.setText(help_en)
         def switch_vn():
             btn_vn.setChecked(True); btn_en.setChecked(False)
-            lbl_help.setText(help_vn)
-            lbl_crs.setText(crs_vn)
+            content.setText(help_vn)
+
+        btn_en.clicked.connect(switch_en)
+        btn_vn.clicked.connect(switch_vn)
+
+        btn_close = QPushButton("OK")
+        btn_close.clicked.connect(dlg.accept)
+        lay.addWidget(btn_close)
+        dlg.exec_()
+
+    # ── CRS Library Dialog ───────────────────────────────────────
+
+    def _show_crs(self):
+        """Show CRS Library dialog with language toggle."""
+        dlg = QDialog(self)
+        dlg.setWindowTitle("🌐 CRS Library / Thư viện Hệ tọa độ")
+        dlg.setMinimumSize(680, 520)
+        lay = QVBoxLayout(dlg)
+
+        # Current project CRS info bar
+        from qgis.core import QgsProject
+        current_crs = QgsProject.instance().crs()
+        crs_info = QLabel(
+            f"📍 Current Project CRS / CRS dự án hiện tại: "
+            f"<b>{current_crs.authid()}</b> — {current_crs.description()}"
+        )
+        crs_info.setStyleSheet(
+            "background:#e8f5e9;padding:8px;border-radius:4px;"
+            "font-size:12px;border:1px solid #a5d6a7"
+        )
+        crs_info.setWordWrap(True)
+        lay.addWidget(crs_info)
+
+        # Language toggle
+        btn_row = QHBoxLayout()
+        btn_en = QPushButton("🇬🇧 English")
+        btn_vn = QPushButton("🇻🇳 Tiếng Việt")
+        for b in [btn_en, btn_vn]:
+            b.setCheckable(True)
+            b.setStyleSheet(
+                "QPushButton{padding:6px 16px;border-radius:4px;"
+                "font-weight:bold;border:2px solid #ccc}"
+                "QPushButton:checked{background:#1565c0;color:#fff;border-color:#1565c0}"
+            )
+        btn_vn.setChecked(True)
+        btn_row.addStretch()
+        btn_row.addWidget(btn_en)
+        btn_row.addWidget(btn_vn)
+        btn_row.addStretch()
+        lay.addLayout(btn_row)
+
+        # CRS content
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        content = QLabel()
+        content.setWordWrap(True)
+        content.setTextFormat(Qt.RichText)
+        content.setOpenExternalLinks(True)
+        content.setMargin(12)
+        scroll.setWidget(content)
+        lay.addWidget(scroll)
+
+        crs_en = self._crs_text_en()
+        crs_vn = self._crs_text_vn()
+        content.setText(crs_vn)
+
+        def switch_en():
+            btn_en.setChecked(True); btn_vn.setChecked(False)
+            content.setText(crs_en)
+        def switch_vn():
+            btn_vn.setChecked(True); btn_en.setChecked(False)
+            content.setText(crs_vn)
 
         btn_en.clicked.connect(switch_en)
         btn_vn.clicked.connect(switch_vn)
