@@ -61,17 +61,17 @@ class LvtDialog(QDialog):
         ("EPSG:3406 — VN-2000 / UTM 49N", "EPSG:3406"),
         ("── VN-2000 Múi 3° (34 tỉnh mới) ──", ""),
         ("103°00' — Điện Biên", "EPSG:9205"),
-        ("104°00' — Sơn La, Hà Giang", "EPSG:9206"),
-        ("104°30' — Cà Mau, Lào Cai", "EPSG:9207"),
-        ("104°45' — An Giang, Lai Châu, Nghệ An, Phú Thọ, Lào Cai", "EPSG:9208"),
-        ("105°00' — Đồng Tháp, Ninh Bình, Thanh Hóa, Cần Thơ, Hà Nội", "EPSG:5896"),
+        ("104°00' — Sơn La", "EPSG:9206"),
+        ("104°30' — Cà Mau", "EPSG:9207"),
+        ("104°45' — An Giang, Lai Châu, Lào Cai, Nghệ An, Phú Thọ", "EPSG:9208"),
+        ("105°00' — TP Hà Nội, Thanh Hóa, Ninh Bình, Đồng Tháp, TP Cần Thơ", "EPSG:5896"),
         ("105°30' — Hà Tĩnh, Hưng Yên, Vĩnh Long", "EPSG:9209"),
-        ("105°45' — Cao Bằng, Tây Ninh, Hải Phòng, TP.HCM", "EPSG:9210"),
+        ("105°45' — Cao Bằng, Tây Ninh, TP Hải Phòng, TP HCM", "EPSG:9210"),
         ("106°00' — Quảng Trị, Tuyên Quang", "EPSG:9211"),
         ("106°30' — Thái Nguyên", "EPSG:9213"),
-        ("107°00' — Bắc Ninh, TP. Huế", "EPSG:9214"),
+        ("107°00' — Bắc Ninh, TP Huế", "EPSG:9214"),
         ("107°15' — Lạng Sơn", "EPSG:9215"),
-        ("107°45' — Đồng Nai, Lâm Đồng, Quảng Ninh, Đà Nẵng", "EPSG:5899"),
+        ("107°45' — Quảng Ninh, Đồng Nai, Lâm Đồng, TP Đà Nẵng", "EPSG:5899"),
         ("108°00' — Quảng Ngãi", "EPSG:9216"),
         ("108°15' — Gia Lai, Khánh Hòa", "EPSG:9217"),
         ("108°30' — Đắk Lắk", "EPSG:9218"),
@@ -1090,43 +1090,41 @@ thước tỷ lệ, khối tiêu đề, viện dẫn. Xuất bản đồ chuẩn
 <h3>🟡 VN-2000 — Provincial 3° Zones (Tỉnh)</h3>
 <p>Used for large-scale cadastral & engineering mapping. Each province is assigned a specific central meridian.</p>
 <table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:11px;width:100%">
-<tr style="background:#fff9c4"><th>CM</th><th>Province (New)</th><th>Merged Provinces</th></tr>
-<tr><td rowspan="1"><b>103°00'</b></td><td>Điện Biên</td><td>—</td></tr>
-<tr><td rowspan="2"><b>104°00'</b></td><td>Sơn La</td><td>—</td></tr>
-<tr><td>Hà Giang</td><td>+ Tuyên Quang</td></tr>
-<tr><td rowspan="2"><b>104°30'</b></td><td>Cà Mau</td><td>+ Bạc Liêu</td></tr>
-<tr><td>Lào Cai</td><td>+ Yên Bái</td></tr>
-<tr><td rowspan="5"><b>104°45'</b></td><td>An Giang</td><td>+ Kiên Giang</td></tr>
+<tr style="background:#fff9c4"><th>CM</th><th>Province (New Name)</th><th>Merged From</th></tr>
+<tr><td><b>103°00'</b></td><td>Điện Biên</td><td>—</td></tr>
+<tr><td><b>104°00'</b></td><td>Sơn La</td><td>—</td></tr>
+<tr><td><b>104°30'</b></td><td>Cà Mau</td><td>Bạc Liêu + Cà Mau</td></tr>
+<tr><td rowspan="5"><b>104°45'</b></td><td>An Giang</td><td>Kiên Giang + An Giang</td></tr>
 <tr><td>Lai Châu</td><td>—</td></tr>
+<tr><td>Lào Cai</td><td>Lào Cai + Yên Bái</td></tr>
 <tr><td>Nghệ An</td><td>—</td></tr>
-<tr><td>Phú Thọ</td><td>+ Vĩnh Phúc + Hòa Bình</td></tr>
-<tr><td>Lào Cai</td><td>+ Yên Bái</td></tr>
-<tr><td rowspan="5"><b>105°00'</b></td><td>Đồng Tháp</td><td>+ Tiền Giang</td></tr>
-<tr><td>Ninh Bình</td><td>+ Hà Nam + Nam Định</td></tr>
+<tr><td>Phú Thọ</td><td>Hòa Bình + Vĩnh Phúc + Phú Thọ</td></tr>
+<tr><td rowspan="5"><b>105°00'</b></td><td>TP Hà Nội</td><td>—</td></tr>
 <tr><td>Thanh Hóa</td><td>—</td></tr>
-<tr><td>TP. Cần Thơ</td><td>+ Sóc Trăng + Hậu Giang</td></tr>
-<tr><td>TP. Hà Nội</td><td>—</td></tr>
+<tr><td>Ninh Bình</td><td>Hà Nam + Nam Định + Ninh Bình</td></tr>
+<tr><td>Đồng Tháp</td><td>Tiền Giang + Đồng Tháp</td></tr>
+<tr><td>TP Cần Thơ</td><td>Sóc Trăng + Hậu Giang + TP Cần Thơ</td></tr>
 <tr><td rowspan="3"><b>105°30'</b></td><td>Hà Tĩnh</td><td>—</td></tr>
-<tr><td>Hưng Yên</td><td>+ Thái Bình</td></tr>
-<tr><td>Vĩnh Long</td><td>+ Bến Tre + Trà Vinh</td></tr>
+<tr><td>Hưng Yên</td><td>Hưng Yên + Thái Bình</td></tr>
+<tr><td>Vĩnh Long</td><td>Bến Tre + Vĩnh Long + Trà Vinh</td></tr>
 <tr><td rowspan="4"><b>105°45'</b></td><td>Cao Bằng</td><td>—</td></tr>
-<tr><td>Tây Ninh</td><td>+ Long An</td></tr>
-<tr><td>TP. Hải Phòng</td><td>+ Hải Dương</td></tr>
-<tr><td>TP. HCM</td><td>+ Bà Rịa-Vũng Tàu + Bình Dương</td></tr>
-<tr><td rowspan="2"><b>106°00'</b></td><td>Quảng Trị</td><td>+ Quảng Bình</td></tr>
-<tr><td>Tuyên Quang</td><td>—</td></tr>
-<tr><td><b>106°30'</b></td><td>Thái Nguyên</td><td>+ Bắc Kạn</td></tr>
-<tr><td rowspan="2"><b>107°00'</b></td><td>Bắc Ninh</td><td>+ Bắc Giang</td></tr>
-<tr><td>TP. Huế</td><td>—</td></tr>
+<tr><td>Tây Ninh</td><td>Tây Ninh + Long An</td></tr>
+<tr><td>TP Hải Phòng</td><td>TP Hải Phòng + Hải Dương</td></tr>
+<tr><td>TP HCM</td><td>Bà Rịa-VT + Bình Dương + TP HCM</td></tr>
+<tr><td rowspan="2"><b>106°00'</b></td><td>Quảng Trị</td><td>Quảng Bình + Quảng Trị</td></tr>
+<tr><td>Tuyên Quang</td><td>Hà Giang + Tuyên Quang</td></tr>
+<tr><td><b>106°30'</b></td><td>Thái Nguyên</td><td>Thái Nguyên + Bắc Kạn</td></tr>
+<tr><td rowspan="2"><b>107°00'</b></td><td>Bắc Ninh</td><td>Bắc Ninh + Bắc Giang</td></tr>
+<tr><td>TP Huế</td><td>—</td></tr>
 <tr><td><b>107°15'</b></td><td>Lạng Sơn</td><td>—</td></tr>
-<tr><td rowspan="4"><b>107°45'</b></td><td>Đồng Nai</td><td>+ Bình Phước</td></tr>
-<tr><td>Lâm Đồng</td><td>+ Đắk Nông + Bình Thuận</td></tr>
-<tr><td>Quảng Ninh</td><td>—</td></tr>
-<tr><td>TP. Đà Nẵng</td><td>+ Quảng Nam</td></tr>
-<tr><td><b>108°00'</b></td><td>Quảng Ngãi</td><td>+ Kon Tum</td></tr>
-<tr><td rowspan="2"><b>108°15'</b></td><td>Gia Lai</td><td>+ Bình Định</td></tr>
-<tr><td>Khánh Hòa</td><td>+ Ninh Thuận</td></tr>
-<tr><td><b>108°30'</b></td><td>Đắk Lắk</td><td>+ Phú Yên</td></tr>
+<tr><td rowspan="4"><b>107°45'</b></td><td>Quảng Ninh</td><td>—</td></tr>
+<tr><td>Đồng Nai</td><td>Bình Phước + Đồng Nai</td></tr>
+<tr><td>Lâm Đồng</td><td>Đắk Nông + Bình Thuận + Lâm Đồng</td></tr>
+<tr><td>TP Đà Nẵng</td><td>Quảng Nam + TP Đà Nẵng</td></tr>
+<tr><td><b>108°00'</b></td><td>Quảng Ngãi</td><td>Kon Tum + Quảng Ngãi</td></tr>
+<tr><td rowspan="2"><b>108°15'</b></td><td>Gia Lai</td><td>Gia Lai + Bình Định</td></tr>
+<tr><td>Khánh Hòa</td><td>Ninh Thuận + Khánh Hòa</td></tr>
+<tr><td><b>108°30'</b></td><td>Đắk Lắk</td><td>Phú Yên + Đắk Lắk</td></tr>
 </table>
 
 <h3>💡 How to Choose?</h3>
@@ -1162,43 +1160,41 @@ thước tỷ lệ, khối tiêu đề, viện dẫn. Xuất bản đồ chuẩn
 <h3>🟡 VN-2000 — Múi 3° (Tỉnh)</h3>
 <p>Dùng cho bản đồ địa chính & kỹ thuật tỷ lệ lớn. Mỗi tỉnh được gán một kinh tuyến trục riêng.</p>
 <table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:11px;width:100%">
-<tr style="background:#fff9c4"><th>KTT</th><th>Tỉnh (mới)</th><th>Tỉnh sáp nhập</th></tr>
+<tr style="background:#fff9c4"><th>KTT</th><th>Tỉnh (tên mới)</th><th>Sáp nhập từ</th></tr>
 <tr><td><b>103°00'</b></td><td>Điện Biên</td><td>—</td></tr>
-<tr><td rowspan="2"><b>104°00'</b></td><td>Sơn La</td><td>—</td></tr>
-<tr><td>Hà Giang</td><td>+ Tuyên Quang</td></tr>
-<tr><td rowspan="2"><b>104°30'</b></td><td>Cà Mau</td><td>+ Bạc Liêu</td></tr>
-<tr><td>Lào Cai</td><td>+ Yên Bái</td></tr>
-<tr><td rowspan="5"><b>104°45'</b></td><td>An Giang</td><td>+ Kiên Giang</td></tr>
+<tr><td><b>104°00'</b></td><td>Sơn La</td><td>—</td></tr>
+<tr><td><b>104°30'</b></td><td>Cà Mau</td><td>Bạc Liêu + Cà Mau</td></tr>
+<tr><td rowspan="5"><b>104°45'</b></td><td>An Giang</td><td>Kiên Giang + An Giang</td></tr>
 <tr><td>Lai Châu</td><td>—</td></tr>
+<tr><td>Lào Cai</td><td>Lào Cai + Yên Bái</td></tr>
 <tr><td>Nghệ An</td><td>—</td></tr>
-<tr><td>Phú Thọ</td><td>+ Vĩnh Phúc + Hòa Bình</td></tr>
-<tr><td>Lào Cai</td><td>+ Yên Bái</td></tr>
-<tr><td rowspan="5"><b>105°00'</b></td><td>Đồng Tháp</td><td>+ Tiền Giang</td></tr>
-<tr><td>Ninh Bình</td><td>+ Hà Nam + Nam Định</td></tr>
+<tr><td>Phú Thọ</td><td>Hòa Bình + Vĩnh Phúc + Phú Thọ</td></tr>
+<tr><td rowspan="5"><b>105°00'</b></td><td>TP Hà Nội</td><td>—</td></tr>
 <tr><td>Thanh Hóa</td><td>—</td></tr>
-<tr><td>TP. Cần Thơ</td><td>+ Sóc Trăng + Hậu Giang</td></tr>
-<tr><td>TP. Hà Nội</td><td>—</td></tr>
+<tr><td>Ninh Bình</td><td>Hà Nam + Nam Định + Ninh Bình</td></tr>
+<tr><td>Đồng Tháp</td><td>Tiền Giang + Đồng Tháp</td></tr>
+<tr><td>TP Cần Thơ</td><td>Sóc Trăng + Hậu Giang + TP Cần Thơ</td></tr>
 <tr><td rowspan="3"><b>105°30'</b></td><td>Hà Tĩnh</td><td>—</td></tr>
-<tr><td>Hưng Yên</td><td>+ Thái Bình</td></tr>
-<tr><td>Vĩnh Long</td><td>+ Bến Tre + Trà Vinh</td></tr>
+<tr><td>Hưng Yên</td><td>Hưng Yên + Thái Bình</td></tr>
+<tr><td>Vĩnh Long</td><td>Bến Tre + Vĩnh Long + Trà Vinh</td></tr>
 <tr><td rowspan="4"><b>105°45'</b></td><td>Cao Bằng</td><td>—</td></tr>
-<tr><td>Tây Ninh</td><td>+ Long An</td></tr>
-<tr><td>TP. Hải Phòng</td><td>+ Hải Dương</td></tr>
-<tr><td>TP. HCM</td><td>+ Bà Rịa-Vũng Tàu + Bình Dương</td></tr>
-<tr><td rowspan="2"><b>106°00'</b></td><td>Quảng Trị</td><td>+ Quảng Bình</td></tr>
-<tr><td>Tuyên Quang</td><td>—</td></tr>
-<tr><td><b>106°30'</b></td><td>Thái Nguyên</td><td>+ Bắc Kạn</td></tr>
-<tr><td rowspan="2"><b>107°00'</b></td><td>Bắc Ninh</td><td>+ Bắc Giang</td></tr>
-<tr><td>TP. Huế</td><td>—</td></tr>
+<tr><td>Tây Ninh</td><td>Tây Ninh + Long An</td></tr>
+<tr><td>TP Hải Phòng</td><td>TP Hải Phòng + Hải Dương</td></tr>
+<tr><td>TP HCM</td><td>Bà Rịa-VT + Bình Dương + TP HCM</td></tr>
+<tr><td rowspan="2"><b>106°00'</b></td><td>Quảng Trị</td><td>Quảng Bình + Quảng Trị</td></tr>
+<tr><td>Tuyên Quang</td><td>Hà Giang + Tuyên Quang</td></tr>
+<tr><td><b>106°30'</b></td><td>Thái Nguyên</td><td>Thái Nguyên + Bắc Kạn</td></tr>
+<tr><td rowspan="2"><b>107°00'</b></td><td>Bắc Ninh</td><td>Bắc Ninh + Bắc Giang</td></tr>
+<tr><td>TP Huế</td><td>—</td></tr>
 <tr><td><b>107°15'</b></td><td>Lạng Sơn</td><td>—</td></tr>
-<tr><td rowspan="4"><b>107°45'</b></td><td>Đồng Nai</td><td>+ Bình Phước</td></tr>
-<tr><td>Lâm Đồng</td><td>+ Đắk Nông + Bình Thuận</td></tr>
-<tr><td>Quảng Ninh</td><td>—</td></tr>
-<tr><td>TP. Đà Nẵng</td><td>+ Quảng Nam</td></tr>
-<tr><td><b>108°00'</b></td><td>Quảng Ngãi</td><td>+ Kon Tum</td></tr>
-<tr><td rowspan="2"><b>108°15'</b></td><td>Gia Lai</td><td>+ Bình Định</td></tr>
-<tr><td>Khánh Hòa</td><td>+ Ninh Thuận</td></tr>
-<tr><td><b>108°30'</b></td><td>Đắk Lắk</td><td>+ Phú Yên</td></tr>
+<tr><td rowspan="4"><b>107°45'</b></td><td>Quảng Ninh</td><td>—</td></tr>
+<tr><td>Đồng Nai</td><td>Bình Phước + Đồng Nai</td></tr>
+<tr><td>Lâm Đồng</td><td>Đắk Nông + Bình Thuận + Lâm Đồng</td></tr>
+<tr><td>TP Đà Nẵng</td><td>Quảng Nam + TP Đà Nẵng</td></tr>
+<tr><td><b>108°00'</b></td><td>Quảng Ngãi</td><td>Kon Tum + Quảng Ngãi</td></tr>
+<tr><td rowspan="2"><b>108°15'</b></td><td>Gia Lai</td><td>Gia Lai + Bình Định</td></tr>
+<tr><td>Khánh Hòa</td><td>Ninh Thuận + Khánh Hòa</td></tr>
+<tr><td><b>108°30'</b></td><td>Đắk Lắk</td><td>Phú Yên + Đắk Lắk</td></tr>
 </table>
 
 <h3>💡 Chọn hệ tọa độ nào?</h3>
