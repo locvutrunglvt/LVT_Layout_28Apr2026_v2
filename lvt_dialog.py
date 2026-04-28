@@ -555,17 +555,19 @@ class LvtDialog(QDialog):
     # ── CRS Library Dialog ───────────────────────────────────────
 
     def _show_crs(self):
-        """Show CRS Library dialog with language toggle."""
+        """Show CRS Library dialog with Set Project CRS feature."""
+        from qgis.core import QgsProject, QgsCoordinateReferenceSystem
+        from qgis.PyQt.QtWidgets import QComboBox, QMessageBox
+
         dlg = QDialog(self)
         dlg.setWindowTitle("🌐 CRS Library / Thư viện Hệ tọa độ")
-        dlg.setMinimumSize(680, 520)
+        dlg.setMinimumSize(700, 560)
         lay = QVBoxLayout(dlg)
 
-        # Current project CRS info bar
-        from qgis.core import QgsProject
+        # ── Current CRS info bar ──
         current_crs = QgsProject.instance().crs()
         crs_info = QLabel(
-            f"📍 Current Project CRS / CRS dự án hiện tại: "
+            f"📍 Current / Hiện tại: "
             f"<b>{current_crs.authid()}</b> — {current_crs.description()}"
         )
         crs_info.setStyleSheet(
@@ -575,7 +577,83 @@ class LvtDialog(QDialog):
         crs_info.setWordWrap(True)
         lay.addWidget(crs_info)
 
-        # Language toggle
+        # ── Set Project CRS ──
+        CRS_LIST = [
+            ("── WGS 84 ──", ""),
+            ("EPSG:4326 — WGS 84 (Lat/Lon)", "EPSG:4326"),
+            ("EPSG:32648 — WGS 84 / UTM 48N (Tây VN)", "EPSG:32648"),
+            ("EPSG:32649 — WGS 84 / UTM 49N (Đông VN)", "EPSG:32649"),
+            ("── VN-2000 Múi 6° ──", ""),
+            ("EPSG:3405 — VN-2000 / UTM 48N", "EPSG:3405"),
+            ("EPSG:3406 — VN-2000 / UTM 49N", "EPSG:3406"),
+            ("── VN-2000 Múi 3° ──", ""),
+            ("EPSG:9205 — 103°00' (Điện Biên, Lai Châu)", "EPSG:9205"),
+            ("EPSG:9206 — 104°00' (Sơn La, Hà Giang)", "EPSG:9206"),
+            ("EPSG:9207 — 104°30' (Lào Cai, Yên Bái)", "EPSG:9207"),
+            ("EPSG:9208 — 104°45' (Tuyên Quang, Phú Thọ)", "EPSG:9208"),
+            ("EPSG:5896 — 105°00' (Hà Nội, Bắc Giang)", "EPSG:5896"),
+            ("EPSG:9209 — 105°30' (Bắc Ninh, Hải Dương…)", "EPSG:9209"),
+            ("EPSG:9210 — 105°45' (Hải Phòng, TP.HCM…)", "EPSG:9210"),
+            ("EPSG:9211 — 106°00' (Quảng Ninh, Thanh Hóa)", "EPSG:9211"),
+            ("EPSG:9212 — 106°15' (Nghệ An)", "EPSG:9212"),
+            ("EPSG:9213 — 106°30' (Quảng Bình, Quảng Trị)", "EPSG:9213"),
+            ("EPSG:5899 — 107°45' (Đà Nẵng, Quảng Nam)", "EPSG:5899"),
+            ("EPSG:9214 — 107°00' (Kon Tum, Gia Lai)", "EPSG:9214"),
+            ("EPSG:9216 — 107°30' (Đắk Lắk, Lâm Đồng)", "EPSG:9216"),
+            ("EPSG:9217 — 108°15' (Bình Định, Phú Yên)", "EPSG:9217"),
+            ("EPSG:9218 — 108°30' (Khánh Hòa, Bình Thuận)", "EPSG:9218"),
+        ]
+
+        set_row = QHBoxLayout()
+        set_row.addWidget(QLabel("⚙️ <b>Set Project CRS / Đổi CRS dự án:</b>"))
+        cmb_crs = QComboBox()
+        cmb_crs.setMinimumWidth(340)
+        for label, _ in CRS_LIST:
+            cmb_crs.addItem(label)
+        # Disable separator items
+        for i, (_, code) in enumerate(CRS_LIST):
+            if not code:
+                cmb_crs.model().item(i).setEnabled(False)
+
+        # Pre-select current CRS if in list
+        cur_auth = current_crs.authid()
+        for i, (_, code) in enumerate(CRS_LIST):
+            if code == cur_auth:
+                cmb_crs.setCurrentIndex(i)
+                break
+
+        btn_apply = QPushButton("✅ Apply / Áp dụng")
+        btn_apply.setStyleSheet(
+            "QPushButton{background:#2e7d32;color:#fff;font-weight:bold;"
+            "padding:6px 16px;border-radius:4px}"
+            "QPushButton:hover{background:#388e3c}"
+        )
+
+        def _apply_crs():
+            idx = cmb_crs.currentIndex()
+            code = CRS_LIST[idx][1]
+            if not code:
+                return
+            new_crs = QgsCoordinateReferenceSystem(code)
+            if not new_crs.isValid():
+                QMessageBox.warning(dlg, "CRS Error",
+                    f"Invalid CRS: {code}")
+                return
+            QgsProject.instance().setCrs(new_crs)
+            crs_info.setText(
+                f"📍 Current / Hiện tại: "
+                f"<b>{new_crs.authid()}</b> — {new_crs.description()}"
+            )
+            QMessageBox.information(dlg, "✅ CRS Updated",
+                f"Project CRS changed to:\n"
+                f"{new_crs.authid()} — {new_crs.description()}")
+
+        btn_apply.clicked.connect(_apply_crs)
+        set_row.addWidget(cmb_crs)
+        set_row.addWidget(btn_apply)
+        lay.addLayout(set_row)
+
+        # ── Language toggle ──
         btn_row = QHBoxLayout()
         btn_en = QPushButton("🇬🇧 English")
         btn_vn = QPushButton("🇻🇳 Tiếng Việt")
@@ -593,7 +671,7 @@ class LvtDialog(QDialog):
         btn_row.addStretch()
         lay.addLayout(btn_row)
 
-        # CRS content
+        # ── CRS content ──
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         content = QLabel()
@@ -1015,17 +1093,34 @@ thước tỷ lệ, khối tiêu đề, viện dẫn. Xuất bản đồ chuẩn
 <h3 style="background:#fff3e0;padding:6px;border-radius:4px">
 🔢 Part 4 — DMS ↔ Decimal Conversion</h3>
 
+<h4>📐 Manual Formula</h4>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;font-size:12px;width:100%;background:#fffde7">
+<tr><td>
+<b>DMS → Decimal:</b>&nbsp;&nbsp; <code style="font-size:14px;background:#fff9c4;padding:4px 8px;border-radius:3px">Decimal = Degrees + Minutes/60 + Seconds/3600</code><br><br>
+<b>Example:</b> 105°27'35"<br>
+→ 105 + 27/60 + 35/3600 = 105 + 0.45 + 0.00972 = <b style="color:#d32f2f;font-size:13px">105.45972</b>
+</td></tr>
+<tr><td>
+<b>Decimal → DMS:</b><br>
+• Degrees = integer part: <b>105</b><br>
+• Minutes = (0.45972 × 60) = 27.583 → <b>27'</b><br>
+• Seconds = (0.583 × 60) = 34.99 → <b>35"</b><br>
+→ Result: <b style="color:#1565c0;font-size:13px">105°27'35"</b>
+</td></tr>
+</table>
+
+<h4>🖥️ QGIS Formulas (Field Calculator)</h4>
 <table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:11px;width:100%">
-<tr style="background:#fff9c4"><th>Direction</th><th>QGIS Formula</th><th>Example</th></tr>
+<tr style="background:#fff9c4"><th>Direction</th><th>QGIS Formula</th><th>Output Type</th></tr>
 <tr>
-<td>D°M'S" → <b>Decimal</b></td>
-<td><code>dms_to_degree("column")</code><br>Output field: Decimal/Real</td>
-<td>105°27'35" → <b>105.45972</b></td>
+<td>DMS → Decimal</td>
+<td><code>dms_to_degree("column_name")</code></td>
+<td>Decimal / Real</td>
 </tr>
 <tr>
-<td>Decimal → <b>D°M'S"</b></td>
-<td><code>to_dms(X)</code> or<br><code>to_dms(transform($geometry, 'EPSG:3405', 'EPSG:4326'))</code><br>Output field: Text</td>
-<td>105.45972 → <b>105°27'35"</b></td>
+<td>Decimal → DMS</td>
+<td><code>to_dms(X)</code> or<br><code>to_dms(transform($geometry, 'EPSG:3405', 'EPSG:4326'))</code></td>
+<td>Text / String</td>
 </tr>
 </table>
 <p>💡 Use <b>Field Calculator</b> in Attribute Table to batch-convert entire columns.</p>
@@ -1124,17 +1219,34 @@ thước tỷ lệ, khối tiêu đề, viện dẫn. Xuất bản đồ chuẩn
 <h3 style="background:#fff3e0;padding:6px;border-radius:4px">
 🔢 Phần 4 — Chuyển đổi Độ Phút Giây ↔ Số thập phân</h3>
 
+<h4>📐 Công thức thủ công</h4>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;font-size:12px;width:100%;background:#fffde7">
+<tr><td>
+<b>Độ Phút Giây → Thập phân:</b>&nbsp;&nbsp; <code style="font-size:14px;background:#fff9c4;padding:4px 8px;border-radius:3px">Thập phân = Độ + Phút/60 + Giây/3600</code><br><br>
+<b>Ví dụ:</b> 105°27'35"<br>
+→ 105 + 27/60 + 35/3600 = 105 + 0.45 + 0.00972 = <b style="color:#d32f2f;font-size:13px">105.45972</b>
+</td></tr>
+<tr><td>
+<b>Thập phân → Độ Phút Giây:</b><br>
+• Độ = phần nguyên: <b>105</b><br>
+• Phút = (0.45972 × 60) = 27.583 → <b>27'</b><br>
+• Giây = (0.583 × 60) = 34.99 → <b>35"</b><br>
+→ Kết quả: <b style="color:#1565c0;font-size:13px">105°27'35"</b>
+</td></tr>
+</table>
+
+<h4>🖥️ Công thức QGIS (Field Calculator)</h4>
 <table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:11px;width:100%">
-<tr style="background:#fff9c4"><th>Chiều</th><th>Công thức QGIS</th><th>Ví dụ</th></tr>
+<tr style="background:#fff9c4"><th>Chiều</th><th>Công thức QGIS</th><th>Kiểu cột</th></tr>
 <tr>
-<td>Độ°Phút'Giây" → <b>Thập phân</b></td>
-<td><code>dms_to_degree("tên_cột")</code><br>Kiểu cột: Decimal/Real</td>
-<td>105°27'35" → <b>105.45972</b></td>
+<td>Độ Phút Giây → Thập phân</td>
+<td><code>dms_to_degree("tên_cột")</code></td>
+<td>Decimal / Real</td>
 </tr>
 <tr>
-<td>Thập phân → <b>Độ°Phút'Giây"</b></td>
-<td><code>to_dms(X)</code> hoặc<br><code>to_dms(transform($geometry, 'EPSG:3405', 'EPSG:4326'))</code><br>Kiểu cột: Text</td>
-<td>105.45972 → <b>105°27'35"</b></td>
+<td>Thập phân → Độ Phút Giây</td>
+<td><code>to_dms(X)</code> hoặc<br><code>to_dms(transform($geometry, 'EPSG:3405', 'EPSG:4326'))</code></td>
+<td>Text / Chuỗi</td>
 </tr>
 </table>
 <p>💡 Dùng <b>Field Calculator</b> trong Bảng thuộc tính để chuyển đổi hàng loạt.</p>
