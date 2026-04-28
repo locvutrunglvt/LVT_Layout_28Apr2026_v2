@@ -386,7 +386,7 @@ class LvtDialog(QDialog):
         g = QGridLayout(w)
         row = 0
 
-        g.addWidget(QLabel("Map Data Sources / Nguồn dữ liệu:"), row, 0, 1, 2)
+        g.addWidget(QLabel("Nguồn dữ liệu xây dựng bản đồ:"), row, 0, 1, 2)
         row += 1
         self.txt_sources = QTextEdit()
         self.txt_sources.setPlaceholderText(
@@ -396,74 +396,15 @@ class LvtDialog(QDialog):
         g.addWidget(self.txt_sources, row, 0, 1, 2)
         row += 1
 
-        grp = QGroupBox("Elements to show / Các thành phần hiển thị")
-        grp_lay = QVBoxLayout(grp)
-        self.chk_legend = QCheckBox("Legend / Chú giải")
-        self.chk_legend.setChecked(True)
-        self.chk_north = QCheckBox("North Arrow / Mũi tên Bắc")
-        self.chk_north.setChecked(True)
-        self.chk_scalebar = QCheckBox("Scale Bar / Thước tỷ lệ")
-        self.chk_scalebar.setChecked(True)
-        for c in [self.chk_legend, self.chk_north, self.chk_scalebar]:
-            grp_lay.addWidget(c)
-
-        # ── North Arrow style selector ──
-        from qgis.core import QgsApplication
-        import glob
-        arrow_row = QHBoxLayout()
-        arrow_row.addWidget(QLabel("    🧭 Style:"))
-        self.cmb_arrow = QComboBox()
-        self.cmb_arrow.setMinimumWidth(250)
-
-        # Auto-detect SVG arrows from QGIS install
-        self._arrow_paths = []
-        search_dirs = list(QgsApplication.svgPaths())
-
-        # Fallback: scan common QGIS install locations on Windows
-        if os.name == 'nt':
-            for prog in [os.environ.get('PROGRAMFILES', 'C:\\Program Files'),
-                         os.environ.get('PROGRAMFILES(X86)', ''),
-                         'C:\\OSGeo4W64', 'C:\\OSGeo4W']:
-                if not prog:
-                    continue
-                for d in glob.glob(os.path.join(prog, 'QGIS*')):
-                    candidate = os.path.join(d, 'apps', 'qgis-ltr', 'svg')
-                    if os.path.isdir(candidate) and candidate not in search_dirs:
-                        search_dirs.append(candidate)
-                    candidate2 = os.path.join(d, 'apps', 'qgis', 'svg')
-                    if os.path.isdir(candidate2) and candidate2 not in search_dirs:
-                        search_dirs.append(candidate2)
-
-        for svg_dir in search_dirs:
-            arrow_dir = os.path.join(svg_dir, 'arrows')
-            if os.path.isdir(arrow_dir):
-                svgs = sorted(glob.glob(os.path.join(arrow_dir, 'NorthArrow_*.svg')))
-                for svg_path in svgs:
-                    name = os.path.splitext(os.path.basename(svg_path))[0]
-                    display = name.replace('NorthArrow_', 'Arrow ')
-                    self.cmb_arrow.addItem(display, svg_path)
-                    self._arrow_paths.append(svg_path)
-                break  # use first found directory
-
-        if not self._arrow_paths:
-            self.cmb_arrow.addItem("(Default / Mặc định)", "")
-
-        # Default to NorthArrow_04 if available
-        for i in range(self.cmb_arrow.count()):
-            if "04" in self.cmb_arrow.itemText(i):
-                self.cmb_arrow.setCurrentIndex(i)
-                break
-
-        arrow_row.addWidget(self.cmb_arrow)
-        arrow_row.addStretch()
-        grp_lay.addLayout(arrow_row)
-
-        # Toggle arrow selector visibility
-        self.cmb_arrow.setEnabled(self.chk_north.isChecked())
-        self.chk_north.toggled.connect(self.cmb_arrow.setEnabled)
-
-        g.addWidget(grp, row, 0, 1, 2)
-        row += 1
+        # Elements always shown (template-driven, no UI toggle needed)
+        class _AlwaysTrue:
+            def isChecked(self): return True
+        class _DefaultArrow:
+            def currentData(self): return ""
+        self.chk_legend = _AlwaysTrue()
+        self.chk_north = _AlwaysTrue()
+        self.chk_scalebar = _AlwaysTrue()
+        self.cmb_arrow = _DefaultArrow()
 
         g.setRowStretch(row, 1)
         return w
