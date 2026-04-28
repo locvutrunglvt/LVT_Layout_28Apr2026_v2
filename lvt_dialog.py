@@ -188,8 +188,10 @@ class LvtDialog(QDialog):
 
         self.lbl_refs = QLabel("References / Viện dẫn:")
         g.addWidget(self.lbl_refs, row, 0)
-        self.txt_refs = QLineEdit()
-        self.txt_refs.setPlaceholderText("e.g. TCVN 8211:2009")
+        self.txt_refs = QLabel(
+            "<i style='color:#555'>Viện dẫn dữ liệu — Điền ở tab Content</i>"
+        )
+        self.txt_refs.setTextFormat(Qt.RichText)
         g.addWidget(self.txt_refs, row, 1)
         row += 1
 
@@ -423,13 +425,30 @@ class LvtDialog(QDialog):
 
         # Auto-detect SVG arrows from QGIS install
         self._arrow_paths = []
-        for svg_dir in QgsApplication.svgPaths():
-            arrow_dir = os.path.join(svg_dir, "arrows")
+        search_dirs = list(QgsApplication.svgPaths())
+
+        # Fallback: scan common QGIS install locations on Windows
+        if os.name == 'nt':
+            for prog in [os.environ.get('PROGRAMFILES', 'C:\\Program Files'),
+                         os.environ.get('PROGRAMFILES(X86)', ''),
+                         'C:\\OSGeo4W64', 'C:\\OSGeo4W']:
+                if not prog:
+                    continue
+                for d in glob.glob(os.path.join(prog, 'QGIS*')):
+                    candidate = os.path.join(d, 'apps', 'qgis-ltr', 'svg')
+                    if os.path.isdir(candidate) and candidate not in search_dirs:
+                        search_dirs.append(candidate)
+                    candidate2 = os.path.join(d, 'apps', 'qgis', 'svg')
+                    if os.path.isdir(candidate2) and candidate2 not in search_dirs:
+                        search_dirs.append(candidate2)
+
+        for svg_dir in search_dirs:
+            arrow_dir = os.path.join(svg_dir, 'arrows')
             if os.path.isdir(arrow_dir):
-                svgs = sorted(glob.glob(os.path.join(arrow_dir, "NorthArrow_*.svg")))
+                svgs = sorted(glob.glob(os.path.join(arrow_dir, 'NorthArrow_*.svg')))
                 for svg_path in svgs:
                     name = os.path.splitext(os.path.basename(svg_path))[0]
-                    display = name.replace("NorthArrow_", "North Arrow ")
+                    display = name.replace('NorthArrow_', 'Arrow ')
                     self.cmb_arrow.addItem(display, svg_path)
                     self._arrow_paths.append(svg_path)
                 break  # use first found directory
@@ -1579,7 +1598,7 @@ thước tỷ lệ, khối tiêu đề, viện dẫn. Xuất bản đồ chuẩn
             "title": self.txt_title.text().strip(),
             "org_name": self.txt_org.text().strip(),
             "study_area": self.txt_study.text().strip(),
-            "references": self.txt_refs.text().strip(),
+            "references": "",
             "author": self.txt_author.text().strip(),
             "date": self.txt_date.text().strip(),
             "page_width": pw,
