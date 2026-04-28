@@ -51,6 +51,32 @@ STANDARD_SCALES = [
 class LvtDialog(QDialog):
     """Main dialog for LVT Map Layout plugin."""
 
+    CRS_LIST = [
+        ("── WGS 84 ──", ""),
+        ("EPSG:4326 — WGS 84 (Lat/Lon)", "EPSG:4326"),
+        ("EPSG:32648 — WGS 84 / UTM 48N", "EPSG:32648"),
+        ("EPSG:32649 — WGS 84 / UTM 49N", "EPSG:32649"),
+        ("── VN-2000 Múi 6° ──", ""),
+        ("EPSG:3405 — VN-2000 / UTM 48N", "EPSG:3405"),
+        ("EPSG:3406 — VN-2000 / UTM 49N", "EPSG:3406"),
+        ("── VN-2000 Múi 3° ──", ""),
+        ("EPSG:9205 — 103°00' (Điện Biên, Lai Châu)", "EPSG:9205"),
+        ("EPSG:9206 — 104°00' (Sơn La, Hà Giang)", "EPSG:9206"),
+        ("EPSG:9207 — 104°30' (Lào Cai, Yên Bái)", "EPSG:9207"),
+        ("EPSG:9208 — 104°45' (Tuyên Quang, Phú Thọ)", "EPSG:9208"),
+        ("EPSG:5896 — 105°00' (Hà Nội, Bắc Giang)", "EPSG:5896"),
+        ("EPSG:9209 — 105°30' (Bắc Ninh, Hải Dương…)", "EPSG:9209"),
+        ("EPSG:9210 — 105°45' (Hải Phòng, TP.HCM…)", "EPSG:9210"),
+        ("EPSG:9211 — 106°00' (Quảng Ninh, Thanh Hóa)", "EPSG:9211"),
+        ("EPSG:9212 — 106°15' (Nghệ An)", "EPSG:9212"),
+        ("EPSG:9213 — 106°30' (Quảng Bình, Quảng Trị)", "EPSG:9213"),
+        ("EPSG:5899 — 107°45' (Đà Nẵng, Quảng Nam)", "EPSG:5899"),
+        ("EPSG:9214 — 107°00' (Kon Tum, Gia Lai)", "EPSG:9214"),
+        ("EPSG:9216 — 107°30' (Đắk Lắk, Lâm Đồng)", "EPSG:9216"),
+        ("EPSG:9217 — 108°15' (Bình Định, Phú Yên)", "EPSG:9217"),
+        ("EPSG:9218 — 108°30' (Khánh Hòa, Bình Thuận)", "EPSG:9218"),
+    ]
+
     def __init__(self, iface, plugin_dir, parent=None):
         super().__init__(parent or iface.mainWindow())
         self.iface = iface
@@ -180,13 +206,73 @@ class LvtDialog(QDialog):
         # ── Common fields ─────────────────────────────────────────
         g.addWidget(QLabel("Author / Người lập:"), row, 0)
         self.txt_author = QLineEdit()
-        self.txt_author.setPlaceholderText("e.g. Lộc Vũ Trung")
+        self.txt_author.setPlaceholderText("e.g. Tác giả bản đồ / Author of Map")
         g.addWidget(self.txt_author, row, 1)
         row += 1
 
         g.addWidget(QLabel("Date / Ngày:"), row, 0)
         self.txt_date = QLineEdit(date.today().strftime("%d/%m/%Y"))
         g.addWidget(self.txt_date, row, 1)
+        row += 1
+
+        # ── Project CRS ──────────────────────────────────────────
+        from qgis.core import QgsProject, QgsCoordinateReferenceSystem
+        from qgis.PyQt.QtWidgets import QMessageBox
+
+        cur_crs = QgsProject.instance().crs()
+        self._crs_label = QLabel(
+            f"📍 <b>{cur_crs.authid()}</b> — {cur_crs.description()}"
+        )
+        self._crs_label.setStyleSheet(
+            "background:#e8f5e9;padding:4px 8px;border-radius:3px;"
+            "font-size:11px;border:1px solid #a5d6a7"
+        )
+        self._crs_label.setWordWrap(True)
+        self._crs_label.setTextFormat(Qt.RichText)
+        g.addWidget(QLabel("🌐 Project CRS:"), row, 0)
+        g.addWidget(self._crs_label, row, 1)
+        row += 1
+
+        crs_row = QHBoxLayout()
+        self.cmb_crs = QComboBox()
+        self.cmb_crs.setMinimumWidth(280)
+        for label, _ in self.CRS_LIST:
+            self.cmb_crs.addItem(label)
+        for i, (_, code) in enumerate(self.CRS_LIST):
+            if not code:
+                self.cmb_crs.model().item(i).setEnabled(False)
+        # Pre-select
+        for i, (_, code) in enumerate(self.CRS_LIST):
+            if code == cur_crs.authid():
+                self.cmb_crs.setCurrentIndex(i)
+                break
+
+        btn_apply_crs = QPushButton("✅ Apply")
+        btn_apply_crs.setStyleSheet(
+            "QPushButton{background:#2e7d32;color:#fff;font-weight:bold;"
+            "padding:4px 12px;border-radius:3px}"
+            "QPushButton:hover{background:#388e3c}"
+        )
+
+        def _apply_project_crs():
+            idx = self.cmb_crs.currentIndex()
+            code = self.CRS_LIST[idx][1]
+            if not code:
+                return
+            new_crs = QgsCoordinateReferenceSystem(code)
+            if not new_crs.isValid():
+                QMessageBox.warning(self, "CRS Error", f"Invalid CRS: {code}")
+                return
+            QgsProject.instance().setCrs(new_crs)
+            self._crs_label.setText(
+                f"📍 <b>{new_crs.authid()}</b> — {new_crs.description()}"
+            )
+
+        btn_apply_crs.clicked.connect(_apply_project_crs)
+        crs_row.addWidget(self.cmb_crs)
+        crs_row.addWidget(btn_apply_crs)
+        g.addWidget(QLabel("⚙️ Set CRS:"), row, 0)
+        g.addLayout(crs_row, row, 1)
         row += 1
 
         g.setRowStretch(row, 1)
@@ -582,46 +668,18 @@ class LvtDialog(QDialog):
         lay.addWidget(crs_info)
 
         # ── Set Project CRS ──
-        CRS_LIST = [
-            ("── WGS 84 ──", ""),
-            ("EPSG:4326 — WGS 84 (Lat/Lon)", "EPSG:4326"),
-            ("EPSG:32648 — WGS 84 / UTM 48N (Tây VN)", "EPSG:32648"),
-            ("EPSG:32649 — WGS 84 / UTM 49N (Đông VN)", "EPSG:32649"),
-            ("── VN-2000 Múi 6° ──", ""),
-            ("EPSG:3405 — VN-2000 / UTM 48N", "EPSG:3405"),
-            ("EPSG:3406 — VN-2000 / UTM 49N", "EPSG:3406"),
-            ("── VN-2000 Múi 3° ──", ""),
-            ("EPSG:9205 — 103°00' (Điện Biên, Lai Châu)", "EPSG:9205"),
-            ("EPSG:9206 — 104°00' (Sơn La, Hà Giang)", "EPSG:9206"),
-            ("EPSG:9207 — 104°30' (Lào Cai, Yên Bái)", "EPSG:9207"),
-            ("EPSG:9208 — 104°45' (Tuyên Quang, Phú Thọ)", "EPSG:9208"),
-            ("EPSG:5896 — 105°00' (Hà Nội, Bắc Giang)", "EPSG:5896"),
-            ("EPSG:9209 — 105°30' (Bắc Ninh, Hải Dương…)", "EPSG:9209"),
-            ("EPSG:9210 — 105°45' (Hải Phòng, TP.HCM…)", "EPSG:9210"),
-            ("EPSG:9211 — 106°00' (Quảng Ninh, Thanh Hóa)", "EPSG:9211"),
-            ("EPSG:9212 — 106°15' (Nghệ An)", "EPSG:9212"),
-            ("EPSG:9213 — 106°30' (Quảng Bình, Quảng Trị)", "EPSG:9213"),
-            ("EPSG:5899 — 107°45' (Đà Nẵng, Quảng Nam)", "EPSG:5899"),
-            ("EPSG:9214 — 107°00' (Kon Tum, Gia Lai)", "EPSG:9214"),
-            ("EPSG:9216 — 107°30' (Đắk Lắk, Lâm Đồng)", "EPSG:9216"),
-            ("EPSG:9217 — 108°15' (Bình Định, Phú Yên)", "EPSG:9217"),
-            ("EPSG:9218 — 108°30' (Khánh Hòa, Bình Thuận)", "EPSG:9218"),
-        ]
-
         set_row = QHBoxLayout()
         set_row.addWidget(QLabel("⚙️ <b>Set Project CRS / Đổi CRS dự án:</b>"))
         cmb_crs = QComboBox()
         cmb_crs.setMinimumWidth(340)
-        for label, _ in CRS_LIST:
+        for label, _ in self.CRS_LIST:
             cmb_crs.addItem(label)
-        # Disable separator items
-        for i, (_, code) in enumerate(CRS_LIST):
+        for i, (_, code) in enumerate(self.CRS_LIST):
             if not code:
                 cmb_crs.model().item(i).setEnabled(False)
 
-        # Pre-select current CRS if in list
         cur_auth = current_crs.authid()
-        for i, (_, code) in enumerate(CRS_LIST):
+        for i, (_, code) in enumerate(self.CRS_LIST):
             if code == cur_auth:
                 cmb_crs.setCurrentIndex(i)
                 break
@@ -635,7 +693,7 @@ class LvtDialog(QDialog):
 
         def _apply_crs():
             idx = cmb_crs.currentIndex()
-            code = CRS_LIST[idx][1]
+            code = self.CRS_LIST[idx][1]
             if not code:
                 return
             new_crs = QgsCoordinateReferenceSystem(code)
@@ -648,6 +706,11 @@ class LvtDialog(QDialog):
                 f"📍 Current / Hiện tại: "
                 f"<b>{new_crs.authid()}</b> — {new_crs.description()}"
             )
+            # Sync General tab label
+            if hasattr(self, '_crs_label'):
+                self._crs_label.setText(
+                    f"📍 <b>{new_crs.authid()}</b> — {new_crs.description()}"
+                )
             QMessageBox.information(dlg, "✅ CRS Updated",
                 f"Project CRS changed to:\n"
                 f"{new_crs.authid()} — {new_crs.description()}")
