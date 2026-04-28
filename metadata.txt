@@ -1,0 +1,19 @@
+[general]
+name=LVT Map Layout
+qgisMinimumVersion=3.28
+description=Automated map layout generator using LVT print templates (EN/VN). Supports batch export via Atlas.
+version=2.0.0
+author=Slow Forest / LVT
+email=support@slowforest.org
+about=Load professional LVT print layout templates (.qpt) with automatic responsive positioning for paper sizes A5-A0. Supports English and Vietnamese languages, single and batch (Atlas) export to PDF, PNG, and SVG.
+tracker=https://github.com/slowforest/lvt-map-layout/issues
+repository=https://github.com/slowforest/lvt-map-layout
+tags=print,layout,template,map,export,atlas,batch,vietnam,forestry
+homepage=https://github.com/slowforest/lvt-map-layout
+category=Sketching
+icon=icon.png
+experimental=False
+deprecated=False
+changelog=2.0.0 - Clean engine: template handles ALL grid/frame logic, no plugin overrides
+    1.0.0 - Initial release
+
