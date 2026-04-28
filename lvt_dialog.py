@@ -474,10 +474,10 @@ class LvtDialog(QDialog):
     # ── Help ─────────────────────────────────────────────────────
 
     def _show_help(self):
-        """Show help dialog with language toggle."""
+        """Show help dialog with language toggle and CRS library tab."""
         dlg = QDialog(self)
         dlg.setWindowTitle("LVT Map Layout — Help / Trợ giúp")
-        dlg.setMinimumSize(620, 500)
+        dlg.setMinimumSize(680, 560)
         lay = QVBoxLayout(dlg)
 
         # Language toggle
@@ -498,27 +498,52 @@ class LvtDialog(QDialog):
         btn_row.addStretch()
         lay.addLayout(btn_row)
 
-        # Content area with scroll
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
-        content = QLabel()
-        content.setWordWrap(True)
-        content.setTextFormat(Qt.RichText)
-        content.setOpenExternalLinks(True)
-        content.setMargin(12)
-        scroll.setWidget(content)
-        lay.addWidget(scroll)
+        # Tabbed content
+        from qgis.PyQt.QtWidgets import QTabWidget
+        tabs = QTabWidget()
+        tabs.setStyleSheet(
+            "QTabWidget::pane{border:1px solid #ccc;border-radius:4px}"
+            "QTabBar::tab{padding:8px 18px;font-weight:bold}"
+            "QTabBar::tab:selected{background:#1565c0;color:#fff;border-radius:4px 4px 0 0}"
+        )
+        lay.addWidget(tabs)
 
+        # ── Tab 1: Help ──
+        def _make_scroll_label():
+            scroll = QScrollArea()
+            scroll.setWidgetResizable(True)
+            lbl = QLabel()
+            lbl.setWordWrap(True)
+            lbl.setTextFormat(Qt.RichText)
+            lbl.setOpenExternalLinks(True)
+            lbl.setMargin(12)
+            scroll.setWidget(lbl)
+            return scroll, lbl
+
+        scroll_help, lbl_help = _make_scroll_label()
+        tabs.addTab(scroll_help, "📖 Help / Trợ giúp")
+
+        # ── Tab 2: CRS Library ──
+        scroll_crs, lbl_crs = _make_scroll_label()
+        tabs.addTab(scroll_crs, "🌐 CRS Library / Hệ tọa độ")
+
+        # Load content
         help_en = self._help_text_en()
         help_vn = self._help_text_vn()
-        content.setText(help_vn)
+        crs_en = self._crs_text_en()
+        crs_vn = self._crs_text_vn()
+
+        lbl_help.setText(help_vn)
+        lbl_crs.setText(crs_vn)
 
         def switch_en():
             btn_en.setChecked(True); btn_vn.setChecked(False)
-            content.setText(help_en)
+            lbl_help.setText(help_en)
+            lbl_crs.setText(crs_en)
         def switch_vn():
             btn_vn.setChecked(True); btn_en.setChecked(False)
-            content.setText(help_vn)
+            lbl_help.setText(help_vn)
+            lbl_crs.setText(crs_vn)
 
         btn_en.clicked.connect(switch_en)
         btn_vn.clicked.connect(switch_vn)
@@ -720,6 +745,110 @@ thước tỷ lệ, khối tiêu đề, viện dẫn. Xuất bản đồ chuẩn
 </table>
 <p style="color:#888;font-size:10px;margin-top:6px"><i>LVT Map Layout v2.0 — Thiết kế cho bản đồ lâm nghiệp &amp; môi trường.</i></p>"""
 
+
+    # ── CRS Library Text ─────────────────────────────────────────
+
+    def _crs_text_en(self):
+        return """
+<h2>🌐 CRS Library — Coordinate Reference Systems for Vietnam</h2>
+<p>Quick reference for EPSG codes commonly used in forestry & environmental mapping in Vietnam.</p>
+
+<h3>🔵 Global / WGS 84</h3>
+<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:11px;width:100%">
+<tr style="background:#e3f2fd"><th>EPSG</th><th>Name</th><th>Type</th><th>Description</th></tr>
+<tr><td><b>4326</b></td><td>WGS 84</td><td>Geographic</td><td>Global standard (GPS). Lat/Lon in degrees. Used by Google Earth, OpenStreetMap.</td></tr>
+<tr><td><b>32648</b></td><td>WGS 84 / UTM zone 48N</td><td>Projected</td><td>Western Vietnam (west of 108°E). Meters. Good for area calculations.</td></tr>
+<tr><td><b>32649</b></td><td>WGS 84 / UTM zone 49N</td><td>Projected</td><td>Eastern Vietnam (east of 108°E). Meters.</td></tr>
+</table>
+
+<h3>🟢 VN-2000 — National 6° Zones (Toàn quốc)</h3>
+<p>Used for national-scale mapping. Based on WGS 84 ellipsoid, Transverse Mercator projection.</p>
+<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:11px;width:100%">
+<tr style="background:#e8f5e9"><th>EPSG</th><th>Name</th><th>Central Meridian</th><th>Coverage</th></tr>
+<tr><td><b>3405</b></td><td>VN-2000 / UTM zone 48N</td><td>105°E</td><td>Western Vietnam (west of 108°E)</td></tr>
+<tr><td><b>3406</b></td><td>VN-2000 / UTM zone 49N</td><td>111°E</td><td>Eastern Vietnam (east of 108°E)</td></tr>
+</table>
+
+<h3>🟡 VN-2000 — Provincial 3° Zones (Tỉnh)</h3>
+<p>Used for large-scale cadastral & engineering mapping. Each province is assigned a specific central meridian.</p>
+<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:11px;width:100%">
+<tr style="background:#fff9c4"><th>EPSG</th><th>Central Meridian</th><th>Provinces / Areas</th></tr>
+<tr><td><b>9205</b></td><td>103°00'</td><td>Điện Biên, Lai Châu</td></tr>
+<tr><td><b>9206</b></td><td>104°00'</td><td>Sơn La, Hà Giang (partial)</td></tr>
+<tr><td><b>9207</b></td><td>104°30'</td><td>Lào Cai, Yên Bái</td></tr>
+<tr><td><b>9208</b></td><td>104°45'</td><td>Tuyên Quang, Phú Thọ, Hòa Bình</td></tr>
+<tr><td><b>5896</b></td><td>105°00'</td><td>Hà Nội, Bắc Giang, Thái Nguyên, Lạng Sơn</td></tr>
+<tr><td><b>9209</b></td><td>105°30'</td><td>Bắc Ninh, Hải Dương, Hưng Yên, Nam Định, Thái Bình, Hà Tĩnh, Sóc Trăng, Tây Ninh, Trà Vinh, Vĩnh Long</td></tr>
+<tr><td><b>9210</b></td><td>105°45'</td><td>Hải Phòng, TP.HCM, Bình Dương, Cao Bằng, Long An, Tiền Giang, Bến Tre</td></tr>
+<tr><td><b>9211</b></td><td>106°00'</td><td>Quảng Ninh, Ninh Bình, Thanh Hóa</td></tr>
+<tr><td><b>9212</b></td><td>106°15'</td><td>Nghệ An (partial)</td></tr>
+<tr><td><b>9213</b></td><td>106°30'</td><td>Quảng Bình, Quảng Trị</td></tr>
+<tr><td><b>5899</b></td><td>107°45'</td><td>Đà Nẵng, Thừa Thiên Huế, Quảng Nam</td></tr>
+<tr><td><b>9214</b></td><td>107°00'</td><td>Kon Tum, Gia Lai (partial)</td></tr>
+<tr><td><b>9216</b></td><td>107°30'</td><td>Đắk Lắk, Đắk Nông, Lâm Đồng</td></tr>
+<tr><td><b>9217</b></td><td>108°15'</td><td>Quảng Ngãi, Bình Định, Phú Yên</td></tr>
+<tr><td><b>9218</b></td><td>108°30'</td><td>Khánh Hòa, Ninh Thuận, Bình Thuận</td></tr>
+</table>
+
+<h3>💡 How to Choose?</h3>
+<ul>
+<li>📍 <b>GPS / web mapping:</b> EPSG:4326 (WGS 84)</li>
+<li>📐 <b>Area/distance calculations:</b> EPSG:32648 or 32649 (UTM)</li>
+<li>🗺️ <b>National maps:</b> EPSG:3405 or 3406 (VN-2000 / 6°)</li>
+<li>📏 <b>Cadastral / provincial:</b> Use the 3° zone matching your province</li>
+</ul>
+<p style="color:#888;font-size:10px"><i>Source: EPSG Registry (epsg.io) — MONRE Vietnam</i></p>"""
+
+    def _crs_text_vn(self):
+        return """
+<h2>🌐 Thư viện Hệ tọa độ — CRS cho Việt Nam</h2>
+<p>Tra cứu nhanh mã EPSG thường dùng trong lâm nghiệp & môi trường tại Việt Nam.</p>
+
+<h3>🔵 Toàn cầu / WGS 84</h3>
+<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:11px;width:100%">
+<tr style="background:#e3f2fd"><th>EPSG</th><th>Tên</th><th>Loại</th><th>Mô tả</th></tr>
+<tr><td><b>4326</b></td><td>WGS 84</td><td>Địa lý</td><td>Tiêu chuẩn toàn cầu (GPS). Tọa độ Lat/Lon tính bằng độ. Google Earth, OpenStreetMap.</td></tr>
+<tr><td><b>32648</b></td><td>WGS 84 / UTM zone 48N</td><td>Phép chiếu</td><td>Tây Việt Nam (phía tây 108°E). Đơn vị: mét.</td></tr>
+<tr><td><b>32649</b></td><td>WGS 84 / UTM zone 49N</td><td>Phép chiếu</td><td>Đông Việt Nam (phía đông 108°E). Đơn vị: mét.</td></tr>
+</table>
+
+<h3>🟢 VN-2000 — Múi 6° (Toàn quốc)</h3>
+<p>Dùng cho bản đồ quy mô quốc gia. Dựa trên ellipsoid WGS 84, phép chiếu Transverse Mercator.</p>
+<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:11px;width:100%">
+<tr style="background:#e8f5e9"><th>EPSG</th><th>Tên</th><th>Kinh tuyến trục</th><th>Phạm vi</th></tr>
+<tr><td><b>3405</b></td><td>VN-2000 / UTM zone 48N</td><td>105°E</td><td>Tây Việt Nam (phía tây 108°E)</td></tr>
+<tr><td><b>3406</b></td><td>VN-2000 / UTM zone 49N</td><td>111°E</td><td>Đông Việt Nam (phía đông 108°E)</td></tr>
+</table>
+
+<h3>🟡 VN-2000 — Múi 3° (Tỉnh)</h3>
+<p>Dùng cho bản đồ địa chính & kỹ thuật tỷ lệ lớn. Mỗi tỉnh được gán một kinh tuyến trục riêng.</p>
+<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:11px;width:100%">
+<tr style="background:#fff9c4"><th>EPSG</th><th>Kinh tuyến trục</th><th>Tỉnh / Khu vực</th></tr>
+<tr><td><b>9205</b></td><td>103°00'</td><td>Điện Biên, Lai Châu</td></tr>
+<tr><td><b>9206</b></td><td>104°00'</td><td>Sơn La, Hà Giang (một phần)</td></tr>
+<tr><td><b>9207</b></td><td>104°30'</td><td>Lào Cai, Yên Bái</td></tr>
+<tr><td><b>9208</b></td><td>104°45'</td><td>Tuyên Quang, Phú Thọ, Hòa Bình</td></tr>
+<tr><td><b>5896</b></td><td>105°00'</td><td>Hà Nội, Bắc Giang, Thái Nguyên, Lạng Sơn</td></tr>
+<tr><td><b>9209</b></td><td>105°30'</td><td>Bắc Ninh, Hải Dương, Hưng Yên, Nam Định, Thái Bình, Hà Tĩnh, Sóc Trăng, Tây Ninh, Trà Vinh, Vĩnh Long</td></tr>
+<tr><td><b>9210</b></td><td>105°45'</td><td>Hải Phòng, TP.HCM, Bình Dương, Cao Bằng, Long An, Tiền Giang, Bến Tre</td></tr>
+<tr><td><b>9211</b></td><td>106°00'</td><td>Quảng Ninh, Ninh Bình, Thanh Hóa</td></tr>
+<tr><td><b>9212</b></td><td>106°15'</td><td>Nghệ An (một phần)</td></tr>
+<tr><td><b>9213</b></td><td>106°30'</td><td>Quảng Bình, Quảng Trị</td></tr>
+<tr><td><b>5899</b></td><td>107°45'</td><td>Đà Nẵng, Thừa Thiên Huế, Quảng Nam</td></tr>
+<tr><td><b>9214</b></td><td>107°00'</td><td>Kon Tum, Gia Lai (một phần)</td></tr>
+<tr><td><b>9216</b></td><td>107°30'</td><td>Đắk Lắk, Đắk Nông, Lâm Đồng</td></tr>
+<tr><td><b>9217</b></td><td>108°15'</td><td>Quảng Ngãi, Bình Định, Phú Yên</td></tr>
+<tr><td><b>9218</b></td><td>108°30'</td><td>Khánh Hòa, Ninh Thuận, Bình Thuận</td></tr>
+</table>
+
+<h3>💡 Chọn hệ tọa độ nào?</h3>
+<ul>
+<li>📍 <b>GPS / bản đồ web:</b> EPSG:4326 (WGS 84)</li>
+<li>📐 <b>Tính diện tích / khoảng cách:</b> EPSG:32648 hoặc 32649 (UTM)</li>
+<li>🗺️ <b>Bản đồ toàn quốc:</b> EPSG:3405 hoặc 3406 (VN-2000 / 6°)</li>
+<li>📏 <b>Địa chính / cấp tỉnh:</b> Tra múi 3° theo tỉnh ở bảng trên</li>
+</ul>
+<p style="color:#888;font-size:10px"><i>Nguồn: EPSG Registry (epsg.io) — Bộ TN&MT Việt Nam</i></p>"""
 
     # ── Collect Parameters ───────────────────────────────────────
 
