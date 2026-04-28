@@ -247,7 +247,12 @@ class LvtEngine:
         if "map_data" in ids and params.get("data_sources"):
             self._set_label(layout, ids["map_data"], params["data_sources"])
 
-        # References / Viện dẫn: fixed in template, do NOT overwrite
+        # References / Viện dẫn: ALWAYS restore fixed title text
+        if "references" in ids:
+            fixed_ref = ("Dữ liệu xây dựng bản đồ:"
+                         if params.get("lang") == "VN"
+                         else "Map data references:")
+            self._set_label(layout, ids["references"], fixed_ref)
 
     # ── Extent Resolution ────────────────────────────────────────
 
